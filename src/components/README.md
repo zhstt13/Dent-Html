@@ -1,11 +1,20 @@
-# Components
+# Component Layer
 
-Extracted HTML components will be placed here.
+این پوشه محل نگهداری کامپوننت‌های مستقل پروژه Dent-Html است.
 
-Planned:
-- header
-- hero
-- navigation
-- content blocks
-- flashcards
-- quiz
+## ترتیب استخراج
+
+1. Header
+2. Hero
+3. Navigation
+4. Content Sections
+5. Flashcard System
+6. Quiz System
+7. Modal / Interactive Components
+
+## قوانین
+
+- هر کامپوننت باید مسئولیت مشخص داشته باشد.
+- قبل از انتقال کامل، نسخه مرجع HTML حفظ می‌شود.
+- وابستگی‌های CSS و JavaScript هر کامپوننت باید ثبت شوند.
+- تغییرات بزرگ باید قابل ردیابی باشند.
