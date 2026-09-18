@@ -1,0 +1,4 @@
+/* Shared component styles */
+.component {
+  transition: var(--transition-fast);
+}
