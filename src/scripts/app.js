@@ -1,4 +1,4 @@
-// Dent HTML component runtime foundation
+// Dent HTML application runtime foundation
 
 const components = [
   'header',
@@ -9,4 +9,13 @@ const components = [
   'quiz'
 ];
 
-console.log('Dent HTML initialized', components);
+window.DentApp = {
+  components,
+  init() {
+    console.log('Dent HTML initialized', components);
+  }
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+  DentApp.init();
+});
