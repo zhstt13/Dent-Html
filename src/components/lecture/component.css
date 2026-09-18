@@ -1,0 +1,10 @@
+/* Lecture Component Styles
+   Responsibility:
+   - Educational content blocks
+   - Lesson layout
+   - Typography hooks
+*/
+
+.lecture-content {
+  display: block;
+}
