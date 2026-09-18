@@ -5,19 +5,22 @@ Central registry for maintainable HTML architecture.
 
 ## Components
 
-| Component | Responsibility | Status |
-|---|---|---|
-| Header | Navigation, branding, actions | Planned |
-| Hero | Main visual introduction | Planned |
-| Content System | Educational content blocks | Planned |
-| Flashcard Engine | Interactive cards | Planned |
-| Quiz Engine | Questions and evaluation | Planned |
-| Motion System | Animations and visual effects | Planned |
-| Responsive Layer | Mobile/Desktop adaptation | Planned |
+| Component | Responsibility | Architecture Status | Original Content Migration |
+|---|---|---|---|
+| Header | Branding and header actions | Mounted | Pending original source |
+| Hero | Main visual introduction | Mounted | Pending original source |
+| Navigation | Section navigation | Mounted + controller wired | Pending original styling/content |
+| Lecture | Educational content blocks | Mounted | Pending original source |
+| Flashcard Engine | Interactive cards | Mounted + controller wired | Pending original data/content |
+| Quiz Engine | Questions and answer selection | Mounted + controller wired | Pending original data/logic |
+| Modal | Shared modal mount | Mounted | Pending original behavior/content |
+| Motion System | Shared reusable animation layer | Foundation ready | Pending original motion migration |
+| Responsive Layer | Mobile/Desktop adaptation | Foundation ready | Pending original responsive rules |
 
 ## Rule
-Every extracted component must have:
-- owner file
+Every migrated component must preserve:
+- original content and behavior
+- clear owner file
 - dependencies
 - debug notes
 - change history
