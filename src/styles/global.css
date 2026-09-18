@@ -1,5 +1,17 @@
+/*
+ Global Styles
+ Responsibility:
+ - Base document rules
+ - Typography defaults
+ - Shared resets
+*/
+
 * {
   box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 html, body {
