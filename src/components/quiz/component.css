@@ -1,10 +1,44 @@
-/* Quiz Component Styles
-   Responsibility:
-   - Question cards
-   - Answer states
-   - Interaction styling
-*/
+/* Quiz component foundation */
+.quiz-section {
+  padding: 24px 16px;
+}
 
-.quiz {
-  display: block;
+.quiz-card {
+  width: min(100%, 640px);
+  margin: 16px auto 0;
+  padding: 20px;
+  border: 1px solid rgba(37, 99, 235, 0.16);
+  border-radius: var(--radius-md);
+  background: var(--color-background);
+}
+
+.question {
+  margin-bottom: 16px;
+  font-weight: 700;
+}
+
+.options {
+  display: grid;
+  gap: 10px;
+}
+
+.options button {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid rgba(17, 24, 39, 0.14);
+  border-radius: 10px;
+  background: #fff;
+  color: var(--color-text);
+  font: inherit;
+  cursor: pointer;
+  transition: border-color var(--transition-fast), transform var(--transition-fast);
+}
+
+.options button:hover {
+  transform: translateY(-1px);
+}
+
+.options button.is-selected {
+  border-color: var(--color-secondary);
+  outline: 2px solid rgba(37, 99, 235, 0.12);
 }
