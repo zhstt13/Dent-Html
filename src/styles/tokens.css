@@ -1,0 +1,9 @@
+/* Global design tokens */
+:root {
+  --color-primary: #0f766e;
+  --color-secondary: #2563eb;
+  --color-background: #ffffff;
+  --color-text: #111827;
+  --radius-md: 12px;
+  --transition-fast: 180ms ease;
+}
