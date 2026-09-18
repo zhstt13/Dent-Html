@@ -1,0 +1,4 @@
+/* Modal Component Styles */
+[data-component="modal"] {
+  display: none;
+}
