@@ -9,11 +9,17 @@ async function loadComponents() {
     try {
       const response = await fetch(`../components/${name}/component.html`);
       if (!response.ok) continue;
+
       mount.innerHTML = await response.text();
+      mount.dispatchEvent(new CustomEvent('component-mounted', {
+        detail: { name }
+      }));
     } catch (error) {
       console.warn(`Component load failed: ${name}`, error);
     }
   }
+
+  window.dispatchEvent(new Event('dent-components-ready'));
 }
 
 window.addEventListener('DOMContentLoaded', loadComponents);
