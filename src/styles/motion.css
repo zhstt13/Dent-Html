@@ -1,0 +1,23 @@
+/* Motion System
+   Central animation layer
+   Keep component animations here when they become reusable.
+*/
+
+:root {
+  --motion-fast: 180ms ease;
+  --motion-normal: 320ms ease;
+  --motion-slow: 600ms ease;
+}
+
+.motion-ready {
+  transition: all var(--motion-normal);
+}
+
+.fade-in {
+  animation: fadeIn var(--motion-slow) forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
