@@ -1,0 +1,10 @@
+/* Quiz Component Styles
+   Responsibility:
+   - Question cards
+   - Answer states
+   - Interaction styling
+*/
+
+.quiz {
+  display: block;
+}
