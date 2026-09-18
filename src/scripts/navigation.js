@@ -1,7 +1,10 @@
-// Navigation controller foundation
+// Dent HTML Navigation Controller
 
 window.DentNavigation = {
   init() {
-    // Future navigation interactions
+    console.log('Navigation initialized');
+  },
+  navigate(target) {
+    return target;
   }
 };
