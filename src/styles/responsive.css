@@ -1,0 +1,13 @@
+/*
+ Responsive Layer
+ Responsibility:
+ - Mobile adaptation
+ - Layout adjustments
+*/
+
+@media (max-width: 768px) {
+  .container {
+    width: 100%;
+    padding-inline: 16px;
+  }
+}
