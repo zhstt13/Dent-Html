@@ -1,0 +1,10 @@
+/* Navigation Component Styles
+   Responsibility:
+   - Navigation layout
+   - Menu states
+   - Responsive hooks
+*/
+
+.navigation {
+  display: block;
+}
