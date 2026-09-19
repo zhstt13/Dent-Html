@@ -7,6 +7,8 @@
     'lecture',
     'flashcard',
     'quiz',
+    'result',
+    'progress',
     'modal'
   ];
 
@@ -25,7 +27,6 @@
     if (!styledComponents.has(name)) return;
     const selector = `link[data-dent-component-style="${name}"]`;
     if (document.querySelector(selector)) return;
-
     const link = document.createElement('link');
     link.rel = 'stylesheet';
     link.href = componentUrl(name, 'component.css');
@@ -36,7 +37,6 @@
   async function mountComponent(name) {
     const target = document.querySelector(`[data-component="${name}"]`);
     if (!target) return false;
-
     try {
       const response = await fetch(componentUrl(name, 'component.html'), { cache: 'no-cache' });
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -59,14 +59,13 @@
         mountResults.push({ name, mounted: await mountComponent(name) });
       }
 
-      ['DentTheme', 'DentNavigation', 'DentFlashcard', 'DentQuiz'].forEach((name) => {
+      ['DentTheme', 'DentNavigation', 'DentFlashcard', 'DentQuiz', 'DentProgress'].forEach((name) => {
         const controller = window[name];
         if (controller?.init) controller.init();
       });
 
       window.dispatchEvent(new CustomEvent('dent-components-ready', { detail: { mountResults } }));
       window.dispatchEvent(new CustomEvent('dent-app-ready', { detail: { mountResults } }));
-
       return mountResults;
     }
   };
