@@ -1,4 +1,4 @@
-name: Dent-Html Smoke Test
+name: Dent-Html Release Validation
 
 on:
   push:
@@ -6,12 +6,23 @@ on:
   pull_request:
     branches: [main]
 
+permissions:
+  contents: read
+
 jobs:
-  smoke-test:
+  release-validation:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
         with:
-          node-version: 20
-      - run: node tests/static-smoke.mjs
+          node-version: '20'
+
+      - name: Static smoke test
+        run: node tests/static-smoke.mjs
+
+      - name: Release integrity test
+        run: node tests/release-integrity.test.mjs
