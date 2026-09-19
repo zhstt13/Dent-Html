@@ -26,3 +26,6 @@ jobs:
 
       - name: Release integrity test
         run: node tests/release-integrity.test.mjs
+
+      - name: Session 5 standalone page smoke test
+        run: node tests/session5-page-smoke.mjs

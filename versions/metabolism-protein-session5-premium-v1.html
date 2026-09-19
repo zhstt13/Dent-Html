@@ -1,0 +1,3858 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>متابولیسم پروتئین‌ها — جلسه ۵ | HTML Study Note</title>
+  
+<style>
+  /* =========================================================
+     HTML STUDY NOTE BLUEPRINT
+     Design tokens + reusable components
+     ========================================================= */
+  :root {
+    --bg: #f5f7fb;
+    --surface: #ffffff;
+    --surface-2: #f8fafc;
+    --surface-3: #eef2f7;
+    --text: #172033;
+    --text-2: #5f6b7a;
+    --text-3: #8993a1;
+    --primary: #315efb;
+    --primary-2: #2448d8;
+    --primary-soft: #eaf0ff;
+    --accent: #0f9f8f;
+    --accent-soft: #e6f7f4;
+    --warning: #d97706;
+    --warning-soft: #fff4df;
+    --danger: #d14343;
+    --danger-soft: #fdecec;
+    --success: #16835b;
+    --success-soft: #e7f7ef;
+    --border: #dfe5ee;
+    --border-strong: #cbd4e1;
+    --shadow-xs: 0 1px 2px rgba(15, 23, 42, .04);
+    --shadow-sm: 0 6px 20px rgba(15, 23, 42, .06);
+    --shadow-md: 0 14px 40px rgba(15, 23, 42, .09);
+    --radius-sm: 8px;
+    --radius: 14px;
+    --radius-lg: 20px;
+    --content-width: 1180px;
+    --reading-width: 790px;
+    --font-size-base: 16px;
+    --font-family: Vazirmatn, IRANSans, Tahoma, "Segoe UI", sans-serif;
+    --line: 1.9;
+    --header-height: 68px;
+  }
+
+  [data-theme="dark"] {
+    --bg: #0b1120;
+    --surface: #121a2a;
+    --surface-2: #182235;
+    --surface-3: #202b40;
+    --text: #f1f5fb;
+    --text-2: #aab6c7;
+    --text-3: #77849a;
+    --primary: #6d8cff;
+    --primary-2: #87a0ff;
+    --primary-soft: #1b2850;
+    --accent: #35c8b5;
+    --accent-soft: #123b37;
+    --warning: #f2a34b;
+    --warning-soft: #49351d;
+    --danger: #ff7474;
+    --danger-soft: #482225;
+    --success: #42d39a;
+    --success-soft: #123c2d;
+    --border: #28364c;
+    --border-strong: #3a4a63;
+    --shadow-xs: 0 1px 2px rgba(0,0,0,.2);
+    --shadow-sm: 0 8px 24px rgba(0,0,0,.22);
+    --shadow-md: 0 18px 50px rgba(0,0,0,.28);
+  }
+
+  [data-theme="sepia"] {
+    --bg: #f5efe4;
+    --surface: #fffaf1;
+    --surface-2: #f8f0e2;
+    --surface-3: #eee1ce;
+    --text: #3e352a;
+    --text-2: #766957;
+    --text-3: #9a8b76;
+    --primary: #6551c8;
+    --primary-2: #5140aa;
+    --primary-soft: #eeeafd;
+    --accent: #a05a18;
+    --accent-soft: #f8e8d6;
+    --warning: #a05a18;
+    --warning-soft: #f9ead5;
+    --danger: #a93b3b;
+    --danger-soft: #f7dddd;
+    --success: #28734f;
+    --success-soft: #e4f0e8;
+    --border: #e2d5c1;
+    --border-strong: #d2c1a7;
+  }
+
+  [data-font-size="small"] { --font-size-base: 14px; }
+  [data-font-size="medium"] { --font-size-base: 16px; }
+  [data-font-size="large"] { --font-size-base: 18px; }
+
+  * { box-sizing: border-box; }
+
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: calc(var(--header-height) + 24px);
+  }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background:
+      radial-gradient(circle at 10% 0%, rgba(49,94,251,.045), transparent 28rem),
+      var(--bg);
+    color: var(--text);
+    font-family: var(--font-family);
+    font-size: var(--font-size-base);
+    line-height: var(--line);
+    transition: background .2s ease, color .2s ease;
+  }
+
+  button, input, select, textarea { font: inherit; }
+  button { -webkit-tap-highlight-color: transparent; }
+
+  ::selection {
+    background: var(--primary);
+    color: #fff;
+  }
+
+  /* ---------- Header / app chrome ---------- */
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    min-height: var(--header-height);
+    background: color-mix(in srgb, var(--surface) 90%, transparent);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+    box-shadow: var(--shadow-xs);
+  }
+
+  .nav-container {
+    width: min(var(--content-width), calc(100% - 28px));
+    min-height: var(--header-height);
+    margin: auto;
+    padding: 10px 0;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 18px;
+  }
+
+  .logo-title {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    color: var(--text);
+    font-size: 1rem;
+    font-weight: 800;
+    white-space: nowrap;
+  }
+
+  .logo-title span {
+    display: inline-flex;
+    align-items: center;
+    min-height: 38px;
+    padding: 5px 11px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--surface-2);
+  }
+
+  .nav-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+    min-width: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .nav-tabs::-webkit-scrollbar { display: none; }
+
+  .nav-btn {
+    border: 0;
+    background: transparent;
+    color: var(--text-2);
+    padding: 8px 13px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 700;
+    white-space: nowrap;
+    transition: .18s ease;
+  }
+
+  .nav-btn:hover {
+    color: var(--primary);
+    background: var(--primary-soft);
+  }
+
+  .nav-btn.active {
+    color: var(--primary);
+    background: var(--primary-soft);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--primary) 18%, transparent);
+  }
+
+  .nav-actions { display: flex; gap: 7px; }
+
+  .btn-icon {
+    min-height: 38px;
+    padding: 7px 11px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface);
+    color: var(--text);
+    cursor: pointer;
+    transition: .18s ease;
+  }
+
+  .btn-icon:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+    transform: translateY(-1px);
+  }
+
+  /* ---------- Layout ---------- */
+  main {
+    width: min(var(--content-width), calc(100% - 28px));
+    margin: 28px auto 56px;
+  }
+
+  .tab-content { display: none; }
+
+  .tab-content.active {
+    display: block;
+    animation: fadeUp .22s ease both;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(7px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+  }
+
+  /* ---------- Buttons ---------- */
+  .btn {
+    min-height: 42px;
+    padding: 9px 15px;
+    border: 1px solid transparent;
+    border-radius: 10px;
+    background: var(--primary);
+    color: #fff;
+    cursor: pointer;
+    font-weight: 750;
+    transition: .18s ease;
+  }
+
+  .btn:hover {
+    background: var(--primary-2);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .btn-outline {
+    background: var(--surface);
+    color: var(--text);
+    border-color: var(--border-strong);
+  }
+
+  .btn-outline:hover {
+    background: var(--primary-soft);
+    border-color: var(--primary);
+    color: var(--primary);
+  }
+
+  .btn-success { background: var(--success); }
+  .btn-success:hover { background: var(--success); filter: brightness(.92); }
+  .btn-danger { background: var(--danger); }
+  .btn-danger:hover { background: var(--danger); filter: brightness(.92); }
+
+  /* ---------- Lecture blueprint ---------- */
+  .lecture-layout {
+    display: grid;
+    grid-template-columns: 245px minmax(0, var(--reading-width));
+    justify-content: center;
+    gap: 24px;
+    align-items: start;
+  }
+
+  .toc-drawer {
+    position: sticky;
+    top: calc(var(--header-height) + 18px);
+    max-height: calc(100vh - var(--header-height) - 36px);
+    overflow: auto;
+    padding: 15px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-xs);
+  }
+
+  .toc-drawer h3 {
+    margin: 0 0 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+    font-size: .9rem;
+    color: var(--text);
+  }
+
+  .toc-list { list-style: none; margin: 0; padding: 0; }
+  .toc-list li { margin: 2px 0; }
+
+  .toc-list a {
+    display: block;
+    padding: 6px 8px;
+    border-radius: 8px;
+    color: var(--text-2);
+    text-decoration: none;
+    font-size: .84rem;
+    transition: .16s ease;
+  }
+
+  .toc-list a:hover {
+    color: var(--primary);
+    background: var(--primary-soft);
+  }
+
+  .toc-list a.h3-link {
+    padding-right: 18px;
+    font-size: .78rem;
+  }
+
+  .lecture-content {
+    padding: clamp(22px, 4vw, 42px);
+    overflow: hidden;
+  }
+
+  .lecture-content::before {
+    content: "LECTURE NOTE";
+    display: inline-flex;
+    margin-bottom: 13px;
+    padding: 4px 9px;
+    border-radius: 999px;
+    background: var(--primary-soft);
+    color: var(--primary);
+    font-size: .67rem;
+    font-weight: 900;
+    letter-spacing: .08em;
+  }
+
+  .lecture-content h2 {
+    margin: 2.1rem 0 .8rem;
+    padding-bottom: .55rem;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+    font-size: clamp(1.25rem, 2vw, 1.55rem);
+    line-height: 1.45;
+    position: relative;
+  }
+
+  .lecture-content h2:first-of-type { margin-top: .25rem; }
+
+  .lecture-content h2::after {
+    content: "";
+    display: block;
+    width: 42px;
+    height: 3px;
+    margin-top: 9px;
+    border-radius: 999px;
+    background: var(--primary);
+  }
+
+  .lecture-content h3 {
+    margin: 1.45rem 0 .55rem;
+    color: var(--accent);
+    font-size: 1.05rem;
+  }
+
+  .lecture-content p {
+    margin: 0 0 1rem;
+    color: var(--text);
+    text-align: justify;
+    text-wrap: pretty;
+  }
+
+  .lecture-content strong { color: var(--primary); }
+
+  /* Reusable note components */
+  .note-callout {
+    margin: 1.25rem 0;
+    padding: 15px 17px;
+    border: 1px solid var(--border);
+    border-right: 4px solid var(--primary);
+    border-radius: 12px;
+    background: var(--surface-2);
+  }
+
+  .note-callout.info { border-right-color: var(--primary); }
+  .note-callout.success { border-right-color: var(--success); background: var(--success-soft); }
+  .note-callout.warning { border-right-color: var(--warning); background: var(--warning-soft); }
+  .note-callout.danger { border-right-color: var(--danger); background: var(--danger-soft); }
+
+  .note-callout-title {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin-bottom: 5px;
+    font-weight: 850;
+  }
+
+  .key-facts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 10px;
+    margin: 1.25rem 0;
+  }
+
+  .key-fact {
+    padding: 13px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+  }
+
+  .key-fact-label {
+    margin-bottom: 3px;
+    color: var(--text-3);
+    font-size: .72rem;
+    font-weight: 800;
+  }
+
+  .key-fact-value {
+    font-weight: 800;
+    line-height: 1.55;
+  }
+
+  .memory-hook {
+    margin: 1.25rem 0;
+    padding: 16px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, var(--primary-soft), var(--surface));
+    border: 1px solid color-mix(in srgb, var(--primary) 20%, var(--border));
+  }
+
+  .memory-hook-title {
+    color: var(--primary);
+    font-size: .78rem;
+    font-weight: 900;
+    margin-bottom: 5px;
+  }
+
+  .formula-box {
+    margin: 1.25rem 0;
+    padding: 16px;
+    direction: ltr;
+    text-align: center;
+    background: var(--surface-2);
+    border: 1px dashed var(--border-strong);
+    border-radius: 12px;
+    font-family: "SFMono-Regular", Consolas, monospace;
+    overflow-x: auto;
+  }
+
+  .mini-table {
+    width: 100%;
+    margin: 1.25rem 0;
+    border-collapse: separate;
+    border-spacing: 0;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+  }
+
+  .mini-table th,
+  .mini-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    text-align: right;
+  }
+
+  .mini-table th {
+    background: var(--surface-2);
+    font-weight: 850;
+  }
+
+  .mini-table tr:last-child td { border-bottom: 0; }
+
+  .diagram-container {
+    margin: 1.5rem 0;
+    padding: 18px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    text-align: center;
+    overflow-x: auto;
+  }
+
+  .diagram-container svg {
+    max-width: 100%;
+    height: auto;
+  }
+
+  .diagram-caption {
+    margin-top: 8px;
+    color: var(--text-3);
+    font-size: .76rem;
+  }
+
+  /* ---------- Flashcards ---------- */
+  .flashcard-scene {
+    perspective: 1200px;
+    max-width: 610px;
+    height: 315px;
+    margin: 28px auto 18px;
+    cursor: pointer;
+  }
+
+  .flashcard {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform .62s cubic-bezier(.2,.75,.2,1);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+  }
+
+  .flashcard.is-flipped { transform: rotateY(180deg); }
+
+  .flashcard-face {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 34px;
+    text-align: center;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+  }
+
+  .flashcard-front { border-top: 5px solid var(--primary); }
+  .flashcard-back {
+    transform: rotateY(180deg);
+    border-top: 5px solid var(--accent);
+    background: var(--surface);
+  }
+
+  .flashcard-controls {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+  }
+
+  /* ---------- Quiz ---------- */
+  .quiz-options-grid { display: grid; gap: 9px; margin: 16px 0; }
+
+  .option-btn {
+    width: 100%;
+    min-height: 50px;
+    padding: 11px 13px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-align: right;
+    border: 1px solid var(--border);
+    border-radius: 11px;
+    background: var(--surface);
+    color: var(--text);
+    cursor: pointer;
+    transition: .16s ease;
+  }
+
+  .option-btn:hover:not(:disabled) {
+    border-color: var(--primary);
+    background: var(--primary-soft);
+    transform: translateX(-2px);
+  }
+
+  .option-btn.correct {
+    background: var(--success-soft);
+    border-color: var(--success);
+    color: var(--success);
+  }
+
+  .option-btn.incorrect {
+    background: var(--danger-soft);
+    border-color: var(--danger);
+    color: var(--danger);
+  }
+
+  .explanation-box {
+    margin-top: 15px;
+    padding: 14px 16px;
+    border: 1px solid var(--border);
+    border-right: 4px solid var(--primary);
+    border-radius: 11px;
+    background: var(--surface-2);
+    font-size: .9rem;
+  }
+
+  .matching-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin: 16px 0;
+  }
+
+  .matching-item {
+    padding: 11px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface);
+    cursor: pointer;
+    text-align: center;
+    user-select: none;
+    transition: .16s ease;
+  }
+
+  .matching-item.selected {
+    border-color: var(--primary);
+    background: var(--primary-soft);
+    font-weight: 800;
+  }
+
+  .matching-item.matched {
+    background: var(--success-soft);
+    border-color: var(--success);
+    cursor: default;
+  }
+
+  /* ---------- Analytics ---------- */
+  .bar-chart-container { display: flex; flex-direction: column; gap: 10px; margin-top: 12px; }
+
+  .chart-row {
+    display: grid;
+    grid-template-columns: 140px 1fr 52px;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .bar-track {
+    height: 10px;
+    overflow: hidden;
+    position: relative;
+    background: var(--surface-3);
+    border-radius: 999px;
+  }
+
+  .bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary), var(--accent));
+    border-radius: inherit;
+    transition: width .5s ease;
+  }
+
+  .table-container { overflow-x: auto; margin-top: 12px; }
+
+  table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: .88rem;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  th, td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    text-align: right;
+  }
+
+  th { background: var(--surface-2); font-weight: 850; }
+  tr:last-child td { border-bottom: 0; }
+
+  /* ---------- Forms / modal ---------- */
+  .form-group { margin-bottom: 15px; }
+
+  .form-group label {
+    display: block;
+    margin-bottom: 6px;
+    color: var(--text-2);
+    font-size: .82rem;
+    font-weight: 800;
+  }
+
+  select, input[type="text"], input[type="number"] {
+    width: 100%;
+    min-height: 43px;
+    padding: 9px 11px;
+    border: 1px solid var(--border-strong);
+    border-radius: 10px;
+    outline: none;
+    background: var(--surface);
+    color: var(--text);
+  }
+
+  select:focus, input[type="text"]:focus, input[type="number"]:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--primary-soft);
+  }
+
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 18px;
+    background: rgba(8, 15, 30, .55);
+    backdrop-filter: blur(7px);
+  }
+
+  .modal-overlay.open { display: flex; }
+
+  .modal-card {
+    width: min(520px, 100%);
+    max-height: min(760px, 90vh);
+    overflow: auto;
+    padding: 22px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+  }
+
+  /* ---------- Blueprint helpers ---------- */
+  .section-meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 7px;
+    margin-bottom: 12px;
+  }
+
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    min-height: 25px;
+    padding: 3px 8px;
+    border-radius: 999px;
+    background: var(--surface-3);
+    color: var(--text-2);
+    font-size: .68rem;
+    font-weight: 850;
+  }
+
+  .tag.primary { background: var(--primary-soft); color: var(--primary); }
+  .tag.accent { background: var(--accent-soft); color: var(--accent); }
+  .tag.warning { background: var(--warning-soft); color: var(--warning); }
+
+  .content-divider {
+    height: 1px;
+    margin: 26px 0;
+    background: var(--border);
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0,0,0,0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 920px) {
+    .nav-container {
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+    }
+
+    .nav-tabs {
+      grid-column: 1 / -1;
+      grid-row: 2;
+      justify-content: flex-start;
+    }
+
+    .lecture-layout {
+      grid-template-columns: 1fr;
+      justify-content: stretch;
+    }
+
+    .toc-drawer {
+      position: relative;
+      top: 0;
+      max-height: 260px;
+      order: 0;
+    }
+  }
+
+  @media (max-width: 600px) {
+    :root { --header-height: 112px; }
+
+    main {
+      width: min(100% - 18px, var(--content-width));
+      margin-top: 16px;
+    }
+
+    .nav-container {
+      width: calc(100% - 18px);
+    }
+
+    .logo-title { font-size: .88rem; }
+    .logo-title span { min-height: 34px; }
+
+    .nav-btn { padding: 7px 10px; font-size: .82rem; }
+
+    .lecture-content { padding: 19px; }
+    .flashcard-scene { height: 280px; }
+    .flashcard-face { padding: 23px; }
+
+    .matching-container { grid-template-columns: 1fr; }
+
+    .chart-row {
+      grid-template-columns: 95px 1fr 45px;
+      gap: 7px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      scroll-behavior: auto !important;
+      transition-duration: .01ms !important;
+      animation-duration: .01ms !important;
+    }
+  }
+  /* ---------- GUMS branded visual hero ---------- */
+  .gums-hero {
+    width: 100%;
+    background: #f7fbff;
+    border-bottom: 1px solid var(--border);
+    overflow: hidden;
+  }
+
+  .gums-hero img {
+    display: block;
+    width: 100%;
+    height: auto;
+    margin: 0 auto;
+  }
+
+  @media (max-width: 600px) {
+    .gums-hero {
+      background: #f3f9ff;
+    }
+
+    .gums-hero img {
+      width: 100%;
+      min-height: 118px;
+      object-fit: contain;
+    }
+  }
+
+
+  /* =========================================================
+     DENT PREMIUM STUDY UI — visual layer v2
+     Preserves the original learning logic; upgrades presentation.
+     ========================================================= */
+  :root {
+    --bg: #eef6fb;
+    --surface: rgba(255,255,255,.92);
+    --surface-2: #f5faff;
+    --surface-3: #e8f3fb;
+    --text: #0b2740;
+    --text-2: #50697d;
+    --text-3: #7d93a4;
+    --primary: #0a65a8;
+    --primary-2: #06497f;
+    --primary-soft: #e5f4ff;
+    --accent: #12a4c8;
+    --accent-soft: #e3f9fd;
+    --success: #168a70;
+    --success-soft: #e4f8f1;
+    --border: rgba(30, 96, 138, .15);
+    --border-strong: rgba(30, 96, 138, .26);
+    --shadow-xs: 0 1px 2px rgba(4, 48, 78, .05);
+    --shadow-sm: 0 14px 38px rgba(13, 72, 110, .09);
+    --shadow-md: 0 24px 70px rgba(6, 56, 92, .16);
+    --radius: 20px;
+    --radius-lg: 28px;
+    --content-width: 1240px;
+    --reading-width: 830px;
+  }
+
+  [data-theme="dark"] {
+    --bg: #071723;
+    --surface: rgba(12,31,45,.92);
+    --surface-2: #102838;
+    --surface-3: #153548;
+    --text: #edf8ff;
+    --text-2: #a9c3d4;
+    --text-3: #7696aa;
+    --primary: #62baf2;
+    --primary-2: #8ed1fb;
+    --primary-soft: #123c58;
+    --accent: #43d4e9;
+    --accent-soft: #123e48;
+    --border: rgba(142,209,251,.14);
+    --border-strong: rgba(142,209,251,.25);
+    --shadow-sm: 0 18px 44px rgba(0,0,0,.24);
+    --shadow-md: 0 28px 78px rgba(0,0,0,.34);
+  }
+
+  [data-theme="sepia"] {
+    --bg: #f6f0e6;
+    --surface: rgba(255,251,244,.94);
+    --surface-2: #fbf4e8;
+    --surface-3: #efe4d2;
+    --text: #342d27;
+    --text-2: #746659;
+    --text-3: #9a8977;
+    --primary: #496f91;
+    --primary-2: #355671;
+    --primary-soft: #e9f0f6;
+    --accent: #a06b3b;
+    --accent-soft: #f7eadc;
+  }
+
+  body {
+    background:
+      radial-gradient(circle at 8% 8%, rgba(76,178,232,.17), transparent 28rem),
+      radial-gradient(circle at 90% 26%, rgba(0,112,176,.10), transparent 32rem),
+      linear-gradient(180deg, color-mix(in srgb, var(--bg) 78%, #fff 22%), var(--bg) 38rem);
+    background-attachment: fixed;
+  }
+
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    opacity: .22;
+    background-image:
+      linear-gradient(rgba(12,95,145,.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(12,95,145,.06) 1px, transparent 1px);
+    background-size: 34px 34px;
+    mask-image: linear-gradient(to bottom, #000, transparent 80%);
+  }
+
+  .study-progress {
+    position: fixed;
+    inset: 0 0 auto 0;
+    height: 3px;
+    z-index: 1600;
+    background: transparent;
+  }
+
+  .study-progress span {
+    display: block;
+    width: 0;
+    height: 100%;
+    background: linear-gradient(90deg, #0a65a8, #32c6e8, #88dcff);
+    box-shadow: 0 0 14px rgba(50,198,232,.55);
+    transition: width .08s linear;
+  }
+
+  .gums-hero {
+    border: 0;
+    padding: clamp(10px, 1.4vw, 18px);
+    background: transparent;
+  }
+
+  .hero-shell {
+    width: min(1460px, 100%);
+    margin: 0 auto;
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+    border: 1px solid rgba(29,101,150,.14);
+    border-radius: clamp(18px, 2.3vw, 34px);
+    box-shadow: 0 22px 70px rgba(15,84,128,.18), inset 0 0 0 1px rgba(255,255,255,.65);
+    background: #dfeffc;
+  }
+
+  .gums-hero img {
+    width: 100%;
+    min-height: 220px;
+    max-height: 505px;
+    object-fit: cover;
+    object-position: center;
+    transform: scale(1.002);
+    transition: transform .9s cubic-bezier(.2,.7,.2,1), filter .35s ease;
+  }
+
+  .hero-shell:hover img { transform: scale(1.012); }
+
+  .hero-shell::after {
+    content: "";
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 38%;
+    z-index: 1;
+    pointer-events: none;
+    background: linear-gradient(to top, rgba(4,35,61,.42), transparent);
+  }
+
+  .hero-sheen {
+    position: absolute;
+    inset: -70% -30%;
+    z-index: 2;
+    pointer-events: none;
+    background: linear-gradient(115deg, transparent 43%, rgba(255,255,255,.26) 49%, transparent 55%);
+    transform: translateX(48%);
+    animation: heroSheen 8s ease-in-out infinite;
+    mix-blend-mode: screen;
+  }
+
+  @keyframes heroSheen {
+    0%, 72% { transform: translateX(48%); opacity: 0; }
+    78% { opacity: .9; }
+    94% { transform: translateX(-48%); opacity: .25; }
+    100% { transform: translateX(-48%); opacity: 0; }
+  }
+
+  .hero-note {
+    position: absolute;
+    z-index: 3;
+    right: clamp(18px, 4vw, 54px);
+    bottom: clamp(16px, 3vw, 40px);
+    display: grid;
+    gap: 3px;
+    max-width: min(460px, 70%);
+    padding: 14px 18px;
+    border: 1px solid rgba(255,255,255,.42);
+    border-radius: 18px;
+    color: #fff;
+    background: linear-gradient(135deg, rgba(4,49,80,.66), rgba(10,101,168,.42));
+    backdrop-filter: blur(14px) saturate(140%);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+    box-shadow: 0 16px 34px rgba(3,35,58,.18);
+  }
+
+  .hero-note-kicker {
+    font-size: .65rem;
+    letter-spacing: .14em;
+    opacity: .78;
+    direction: ltr;
+    text-align: right;
+  }
+
+  .hero-note strong { font-size: clamp(1rem, 2vw, 1.35rem); }
+  .hero-note > span:last-child { font-size: .78rem; opacity: .86; }
+
+  header {
+    top: 6px;
+    width: min(1240px, calc(100% - 24px));
+    margin: 4px auto 0;
+    min-height: 62px;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    background: color-mix(in srgb, var(--surface) 82%, transparent);
+    box-shadow: 0 12px 40px rgba(9,70,110,.10);
+  }
+
+  .nav-container {
+    width: 100%;
+    min-height: 60px;
+    padding: 9px 12px;
+    gap: 12px;
+  }
+
+  .logo-title span {
+    border: 0;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--primary), #159bc5);
+    color: #fff;
+    box-shadow: 0 8px 22px rgba(10,101,168,.22);
+  }
+
+  .nav-tabs {
+    gap: 7px;
+    padding: 4px;
+    border-radius: 14px;
+    background: color-mix(in srgb, var(--surface-3) 70%, transparent);
+  }
+
+  .nav-btn { position: relative; border-radius: 11px; }
+
+  .nav-btn.active {
+    color: #fff;
+    background: linear-gradient(135deg, var(--primary), #159bc5);
+    box-shadow: 0 8px 18px rgba(10,101,168,.18);
+  }
+
+  .btn-icon {
+    border-color: var(--border);
+    border-radius: 12px;
+    background: color-mix(in srgb, var(--surface) 88%, transparent);
+  }
+
+  .study-dashboard {
+    width: min(1240px, calc(100% - 28px));
+    margin: 18px auto 0;
+  }
+
+  .dashboard-inner {
+    display: grid;
+    grid-template-columns: 1.25fr repeat(3, 1fr);
+    gap: 10px;
+    padding: 10px;
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    background: color-mix(in srgb, var(--surface) 82%, transparent);
+    backdrop-filter: blur(14px);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .session-chip,
+  .dashboard-stat {
+    min-height: 62px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 1px;
+    padding: 10px 14px;
+    border-radius: 13px;
+    background: var(--surface-2);
+  }
+
+  .session-chip {
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(135deg, var(--primary-soft), var(--accent-soft));
+  }
+
+  .chip-dot {
+    width: 9px;
+    height: 9px;
+    flex: 0 0 auto;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 0 5px color-mix(in srgb, var(--accent) 15%, transparent);
+  }
+
+  .session-chip b { color: var(--primary); }
+  .session-chip > span:last-child { color: var(--text-2); font-size: .78rem; }
+  .dashboard-stat span { color: var(--text-3); font-size: .67rem; font-weight: 800; }
+  .dashboard-stat b { color: var(--text); font-size: .82rem; }
+  .dashboard-stat-accent { border: 1px solid color-mix(in srgb, var(--accent) 24%, var(--border)); }
+
+  main { margin-top: 18px; }
+
+  .lecture-layout {
+    grid-template-columns: 260px minmax(0, var(--reading-width));
+    gap: 20px;
+  }
+
+  .toc-drawer {
+    padding: 12px;
+    border-color: var(--border);
+    border-radius: 18px;
+    background: color-mix(in srgb, var(--surface) 89%, transparent);
+    box-shadow: var(--shadow-sm);
+    backdrop-filter: blur(14px);
+  }
+
+  .toc-drawer h3 {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    margin: -4px -4px 8px;
+    padding: 10px 10px 12px;
+    border-radius: 12px 12px 0 0;
+    background: color-mix(in srgb, var(--surface) 92%, transparent);
+  }
+
+  .toc-list a {
+    position: relative;
+    padding: 7px 10px;
+    border-radius: 10px;
+    line-height: 1.55;
+  }
+
+  .toc-list a::before {
+    content: "";
+    position: absolute;
+    right: 0;
+    top: 50%;
+    width: 3px;
+    height: 0;
+    border-radius: 999px;
+    background: var(--accent);
+    transform: translateY(-50%);
+    transition: height .18s ease;
+  }
+
+  .toc-list a.is-current {
+    color: var(--primary);
+    background: linear-gradient(90deg, var(--primary-soft), transparent);
+    font-weight: 800;
+  }
+
+  .toc-list a.is-current::before { height: 56%; }
+
+  .card {
+    border-color: var(--border);
+    background: color-mix(in srgb, var(--surface) 94%, transparent);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .lecture-content {
+    position: relative;
+    padding: clamp(24px, 4.2vw, 50px);
+    border-radius: 24px;
+  }
+
+  .lecture-content::before {
+    content: "SESSION 05 · SMART NOTE";
+    letter-spacing: .11em;
+    background: linear-gradient(135deg, var(--primary-soft), var(--accent-soft));
+    border: 1px solid color-mix(in srgb, var(--primary) 14%, var(--border));
+  }
+
+  .section-meta { gap: 8px; margin-bottom: 20px; }
+  .tag { min-height: 28px; padding-inline: 10px; border: 1px solid var(--border); background: var(--surface-2); }
+
+  .lecture-content h2 {
+    margin-top: 2.5rem;
+    padding: .7rem 0 .75rem;
+    border-bottom: 1px solid var(--border);
+    font-size: clamp(1.3rem, 2.2vw, 1.68rem);
+  }
+
+  .lecture-content h2::after {
+    width: 64px;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary), var(--accent));
+  }
+
+  .lecture-content h3 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--primary);
+  }
+
+  .lecture-content h3::before {
+    content: "";
+    width: 8px;
+    height: 8px;
+    flex: 0 0 auto;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 0 5px color-mix(in srgb, var(--accent) 12%, transparent);
+  }
+
+  .note-callout,
+  .memory-hook,
+  .formula-box,
+  .diagram-container,
+  .key-fact {
+    border-color: var(--border);
+    box-shadow: 0 8px 24px rgba(10,78,119,.055);
+  }
+
+  .note-callout { border-right-width: 5px; border-radius: 15px; }
+  .memory-hook { position: relative; overflow: hidden; }
+  .memory-hook::after {
+    content: "";
+    position: absolute;
+    width: 90px;
+    height: 90px;
+    left: -30px;
+    top: -38px;
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--accent) 13%, transparent);
+  }
+
+  .key-fact {
+    position: relative;
+    overflow: hidden;
+    transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+  }
+
+  .key-fact:hover {
+    transform: translateY(-2px);
+    border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
+    box-shadow: 0 14px 30px rgba(10,78,119,.10);
+  }
+
+  .diagram-container {
+    background:
+      radial-gradient(circle at 50% 0%, color-mix(in srgb, var(--primary-soft) 70%, transparent), transparent 55%),
+      var(--surface-2);
+  }
+
+  .mini-table, table { box-shadow: 0 10px 24px rgba(10,78,119,.05); }
+  th { color: var(--primary); }
+
+  #tab-flashcards > .card,
+  #tab-quiz > .card,
+  #tab-analytics > .card {
+    border-radius: 24px;
+    overflow: hidden;
+  }
+
+  .flashcard-scene { height: 330px; }
+
+  .flashcard {
+    box-shadow: 0 24px 70px rgba(9,75,117,.18);
+  }
+
+  .flashcard-face {
+    border-color: var(--border);
+    background:
+      radial-gradient(circle at 15% 10%, color-mix(in srgb, var(--accent) 12%, transparent), transparent 15rem),
+      var(--surface);
+  }
+
+  .flashcard-front { border-top: 6px solid var(--primary); }
+  .flashcard-back { border-top: 6px solid var(--accent); }
+
+  .btn {
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--primary), #159bc5);
+    box-shadow: 0 8px 18px rgba(10,101,168,.13);
+  }
+
+  .btn:hover { background: linear-gradient(135deg, var(--primary-2), var(--primary)); }
+  .btn-outline { background: var(--surface); box-shadow: none; }
+  .btn-danger { background: linear-gradient(135deg, #c8414c, #e05b5f); }
+  .btn-success { background: linear-gradient(135deg, #0d836b, #23a889); }
+
+  .option-btn {
+    border-radius: 13px;
+    box-shadow: 0 6px 18px rgba(10,78,119,.04);
+  }
+
+  .option-btn:hover:not(:disabled) { transform: translateX(-3px); }
+
+  .bar-track { height: 12px; box-shadow: inset 0 1px 2px rgba(0,0,0,.05); }
+  .bar-fill { background: linear-gradient(90deg, #0a65a8, #19a8c6, #48d0de); }
+
+  .modal-overlay { background: rgba(4,24,38,.6); }
+  .modal-card { border-radius: 24px; box-shadow: 0 34px 90px rgba(0,0,0,.28); }
+
+  :focus-visible {
+    outline: 3px solid color-mix(in srgb, var(--accent) 55%, transparent);
+    outline-offset: 3px;
+  }
+
+  @media (max-width: 920px) {
+    header { width: calc(100% - 18px); top: 4px; }
+    .dashboard-inner { grid-template-columns: 1fr 1fr; }
+    .session-chip { grid-column: 1 / -1; }
+    .lecture-layout { gap: 12px; }
+    .toc-drawer { max-height: 220px; }
+  }
+
+  @media (max-width: 600px) {
+    :root { --header-height: 116px; }
+    .gums-hero { padding: 7px; }
+    .hero-shell { border-radius: 19px; }
+    .gums-hero img {
+      min-height: 190px;
+      height: clamp(190px, 52vw, 280px);
+      object-fit: cover;
+      object-position: 66% center;
+    }
+    .hero-note {
+      right: 12px;
+      bottom: 11px;
+      max-width: calc(100% - 24px);
+      padding: 10px 12px;
+      border-radius: 13px;
+    }
+    .hero-note-kicker { font-size: .55rem; }
+    .hero-note strong { font-size: .96rem; }
+    .hero-note > span:last-child { display: none; }
+    header { border-radius: 16px; }
+    .nav-container { padding: 8px; }
+    .nav-tabs { order: 3; width: 100%; }
+    .nav-btn { flex: 1 0 auto; }
+    .study-dashboard { width: calc(100% - 18px); margin-top: 12px; }
+    .dashboard-inner { grid-template-columns: 1fr 1fr; padding: 7px; gap: 7px; }
+    .dashboard-stat { min-height: 58px; padding: 8px 10px; }
+    .dashboard-stat b { font-size: .75rem; }
+    .session-chip { min-height: 48px; }
+    main { width: calc(100% - 14px); }
+    .lecture-content { padding: 18px 16px 24px; border-radius: 18px; }
+    .lecture-content p { text-align: right; }
+    .key-facts { grid-template-columns: 1fr; }
+    .flashcard-scene { height: 300px; margin-inline: 2px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero-sheen { display: none; }
+    .hero-shell:hover img { transform: none; }
+  }
+
+</style>
+
+</head>
+
+<body>
+
+  <div class="study-progress" aria-hidden="true"><span id="scrollProgressBar"></span></div>
+
+  <section class="gums-hero" aria-label="GUMS Dentistry Mehr branded header">
+    <div class="hero-shell">
+      <img src="../assets/gums-header.png" alt="GUMS Dentistry Mehr — modern dental hero header">
+      <div class="hero-sheen" aria-hidden="true"></div>
+      <div class="hero-note" aria-label="مشخصات جلسه">
+        <span class="hero-note-kicker">BIOCHEMISTRY · SESSION 05</span>
+        <strong>متابولیسم پروتئین‌ها</strong>
+        <span>جزوه تعاملی، فلش‌کارت، آزمون و تحلیل عملکرد</span>
+      </div>
+    </div>
+  </section>
+
+  <header>
+    <div class="nav-container">
+      <div class="logo-title"><span>بیوشیمی · متابولیسم پروتئین</span></div>
+      <nav class="nav-tabs">
+        <button class="nav-btn active" data-tab="lecture">جزوه</button>
+        <button class="nav-btn" data-tab="flashcards">فلش‌کارت</button>
+        <button class="nav-btn" data-tab="quiz">آزمون</button>
+        <button class="nav-btn" data-tab="analytics">تحلیل عملکرد</button>
+      </nav>
+      <div class="nav-actions">
+        <button class="btn-icon" id="btnSettingsModal" title="تنظیمات ظاهر">⚙️ تنظیمات</button>
+      </div>
+    </div>
+  </header>
+
+  <section class="study-dashboard" aria-label="نمای کلی جلسه">
+    <div class="dashboard-inner">
+      <div class="session-chip"><span class="chip-dot"></span><b>جلسه ۵</b><span>متابولیسم پروتئین</span></div>
+      <div class="dashboard-stat"><span>حالت مطالعه</span><b>جزوه تعاملی</b></div>
+      <div class="dashboard-stat"><span>ابزارها</span><b>فلش‌کارت · آزمون · تحلیل</b></div>
+      <div class="dashboard-stat dashboard-stat-accent"><span>هدف</span><b>مرور سریع + تثبیت مفهومی</b></div>
+    </div>
+  </section>
+
+  <main>
+    <!-- TAB 1: LECTURE -->
+    <section id="tab-lecture" class="tab-content active">
+      <div class="lecture-layout">
+        <aside class="toc-drawer">
+          <h3>فهرست مطالب</h3>
+          <ul class="toc-list" id="tocList"></ul>
+        </aside>
+        <article class="lecture-content card" id="lectureArticle">
+          <div class="section-meta">
+            <span class="tag primary">بیوشیمی دیسیپلین</span>
+            <span class="tag">دکتر آقاجانی</span>
+            <span class="tag accent">متابولیسم پروتئین‌ها</span>
+            <span class="tag">جلسه ۵</span>
+          </div>
+
+          <h2 id="sec-carbon">متابولیسم اسکلت کربنی</h2>
+          <p>
+            وقتی آمینواسید عامل آمین خود را از دست می‌دهد، اسکلت کربنی باقی‌مانده می‌تواند
+            از جایگاه‌های مختلف وارد سیکل کربس شود و متابولیزه گردد. در ادامه، محصولات احیایی
+            حاصل از سیکل کربس یعنی NADH و FADH از طریق زنجیره تنفسی به تولید ATP کمک می‌کنند.
+          </p>
+
+          <div class="note-callout info">
+            <div class="note-callout-title">اصل مفهومی</div>
+            <div>سیکل کربس در این جزوه به‌عنوان یک «شاهراه متابولیک» معرفی شده است؛ گلوکز از مسیر پیرووات و آمینواسیدها از چندین جایگاه مختلف به این مسیر می‌رسند.</div>
+          </div>
+
+          <h3 id="sec-keto-gluco">کتوژنیک و گلوکوژنیک</h3>
+          <p>
+            آمینواسیدهایی که پس از حذف عامل آمین، پیرووات، استیل‌کوآنزیم A یا استواستیل‌کوآنزیم A
+            می‌سازند، در گروه کتوژنیک قرار می‌گیرند. گلوکوژنیک‌ها می‌توانند از مسیر پیرووات،
+            آلفاکتوگلوتارات، سوکسینیل‌کوآنزیم A، فومارات یا اگزالواستات به متابولیسم وارد شوند.
+          </p>
+
+          <div class="key-facts">
+            <div class="key-fact">
+              <div class="key-fact-label">صرفاً کتوژنیک</div>
+              <div class="key-fact-value">لوسین + لایزین</div>
+            </div>
+            <div class="key-fact">
+              <div class="key-fact-label">هم کتوژنیک هم گلوکوژنیک</div>
+              <div class="key-fact-value">ایزولوسین، فنیل‌آلانین، تریپتوفان، تیروزین</div>
+            </div>
+            <div class="key-fact">
+              <div class="key-fact-label">گلوکوژنیک</div>
+              <div class="key-fact-value">بقیهٔ آمینواسیدها</div>
+            </div>
+          </div>
+
+          <div class="memory-hook">
+            <div class="memory-hook-title">MEMORY HOOK — طبقه‌بندی</div>
+            <div>۲ آمینواسید فقط کتوژنیک‌اند؛ ۴ آمینواسید هم کتوژنیک و هم گلوکوژنیک‌اند؛ بقیه گلوکوژنیک‌اند.</div>
+          </div>
+
+          <h2 id="sec-carbon-fates">سرنوشت اتم‌های کربن</h2>
+          <p>در متن جزوه تأکید شده است که نیازی به حفظ شکل اسلاید نیست و درک مسیرهای ورود به سیکل کربس کفایت می‌کند.</p>
+
+          <div class="diagram-container">
+            <svg viewBox="0 0 820 330" role="img" aria-label="مسیرهای ورود اسکلت کربنی آمینواسیدها به سیکل کربس" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <marker id="arrow2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                  <path d="M 0 0 L 10 5 L 0 10 z" fill="currentColor"/>
+                </marker>
+              </defs>
+              <rect x="295" y="105" width="230" height="115" rx="18" fill="var(--primary-soft)" stroke="var(--primary)" stroke-width="2"/>
+              <text x="410" y="150" text-anchor="middle" font-size="24" font-weight="800" fill="var(--primary)">سیکل کربس</text>
+              <text x="410" y="182" text-anchor="middle" font-size="15" fill="var(--text-2)">شاهراه متابولیک</text>
+
+              <g font-size="15" text-anchor="middle">
+                <text x="85" y="45" fill="var(--text)">پیرووات</text>
+                <text x="245" y="45" fill="var(--text)">استیل-CoA</text>
+                <text x="395" y="45" fill="var(--text)">استواستیل-CoA</text>
+                <text x="565" y="45" fill="var(--text)">آلفاکتوگلوتارات</text>
+                <text x="735" y="45" fill="var(--text)">سوکسینیل-CoA</text>
+                <text x="170" y="300" fill="var(--text)">فومارات</text>
+                <text x="650" y="300" fill="var(--text)">اگزالواستات</text>
+              </g>
+
+              <g stroke="var(--accent)" stroke-width="3" fill="none" marker-end="url(#arrow2)">
+                <path d="M 105 58 C 155 95, 225 112, 295 132"/>
+                <path d="M 245 58 C 280 95, 320 112, 330 120"/>
+                <path d="M 395 58 C 400 84, 405 95, 405 105"/>
+                <path d="M 565 58 C 535 100, 505 120, 525 140"/>
+                <path d="M 720 58 C 640 92, 585 120, 525 155"/>
+                <path d="M 190 278 C 245 245, 280 230, 310 220"/>
+                <path d="M 625 278 C 570 245, 540 230, 515 215"/>
+              </g>
+
+              <rect x="590" y="88" width="180" height="46" rx="12" fill="var(--surface-2)" stroke="var(--border)"/>
+              <text x="680" y="117" text-anchor="middle" font-size="13" fill="var(--text-2)">آسپارژین + آسپارتیک اسید</text>
+              <path d="M 650 135 C 610 155, 570 170, 525 180" stroke="var(--warning)" stroke-width="2.5" fill="none" marker-end="url(#arrow2)"/>
+
+              <text x="410" y="322" text-anchor="middle" font-size="13" fill="var(--text-3)">شکل مفهومی بر اساس مسیرهای ذکرشده در جزوه</text>
+            </svg>
+          </div>
+
+          <h3 id="sec-entry-points">۷ جایگاه ورود ذکرشده در جزوه</h3>
+          <ol style="padding-right:1.25rem; margin:0 0 1rem;">
+            <li>تبدیل به پیرووات</li>
+            <li>تبدیل به استیل‌کوآنزیم A</li>
+            <li>تبدیل به استواستیل‌کوآنزیم</li>
+            <li>ورود از محل آلفاکتوگلوتارات</li>
+            <li>ورود از محل سوکسینیل‌کوآنزیم A</li>
+            <li>ورود از محل فومارات</li>
+            <li>آسپارژین و آسپارتیک اسید از طریق اگزالواستات</li>
+          </ol>
+
+          <h2 id="sec-biosynthesis">بیوسنتز آمینواسیدها</h2>
+          <p>
+            آمینواسیدها در شرایط نرمال به دو گروه ضروری و غیرضروری تقسیم می‌شوند. ضروری‌ها از راه
+            مواد غذایی دریافت می‌شوند و غیرضروری‌ها با کمک واکنش‌های متابولیک در بدن ساخته می‌شوند.
+            جزوه اشاره می‌کند که بیماری‌ها می‌توانند این مرزبندی را تغییر دهند.
+          </p>
+
+          <div class="note-callout warning">
+            <div class="note-callout-title">نکتهٔ امتحانی — تعداد آنزیم‌ها</div>
+            <div>در متن جزوه برای ساخت مجموعهٔ آمینواسیدهای غیرضروری ۱۷ آنزیم و برای آمینواسیدهای ضروری ۵۹ آنزیم ذکر شده است؛ همچنین تأکید شده که ساخت آمینواسیدهای شاخه‌دار می‌تواند به آنزیم‌های بیشتری نیاز داشته باشد.</div>
+          </div>
+
+          <h3 id="sec-nonessential">واکنش‌های ساخت آمینواسیدهای غیرضروری</h3>
+          <div class="key-facts">
+            <div class="key-fact">
+              <div class="key-fact-label">۱</div>
+              <div class="key-fact-value">آلفاکتوگلوتارات + عامل آمین → گلوتامیک اسید؛ آنزیم: گلوتامات دهیدروژناز</div>
+            </div>
+            <div class="key-fact">
+              <div class="key-fact-label">۲</div>
+              <div class="key-fact-value">گلوتامیک اسید + آمونیاک → گلوتامین؛ آنزیم: گلوتامین سنتاز</div>
+            </div>
+            <div class="key-fact">
+              <div class="key-fact-label">۳</div>
+              <div class="key-fact-value">آسپارتیک اسید + عامل آمین → آسپاراژین؛ آنزیم: آسپاراژین سنتاز</div>
+            </div>
+          </div>
+
+          <h3 id="sec-transamination">ترانس‌آمیناسیون و مشتقات پیرووات</h3>
+          <p>
+            آلانین و آسپارتیک اسید می‌توانند از پیرووات حاصل شوند. افزودن عامل آمین به پیرووات
+            باعث ایجاد آلانین می‌شود. در جزوه همچنین تشکیل آسپارتیک اسید از آلفاکتوگلوتارات در حضور
+            آلانین به‌عنوان یک واکنش ترنس‌آمیناسیون مطرح شده است.
+          </p>
+
+          <h3 id="sec-serine">سرین، گلایسین و سیستئین</h3>
+          <p>
+            سرین از فسفوگلیسرات ساخته می‌شود. از سرین می‌توان گلایسین ساخت و سیستئین نیز می‌تواند
+            از سرین ایجاد شود. در متن جزوه، شباهت ساختاری سرین و سیستئین با OH و SH و همچنین
+            شباهت هموسرین و هموسیستئین با همین الگوی OH/SH مورد تأکید قرار گرفته است.
+          </p>
+
+          <div class="note-callout info">
+            <div class="note-callout-title">مسیر سیستئین</div>
+            <div>سرین + هموسیستئین ← سیستاتیونین با آنزیم <strong>سیستاتیونین سنتاز</strong>؛ سپس سیستاتیونین توسط <strong>سیستاتیوناز</strong> شکسته می‌شود و سیستئین و هموسرین آزاد می‌شوند.</div>
+          </div>
+
+          <h3 id="sec-proline">تشکیل پرولین</h3>
+          <p>از گلوتامیک اسید طی سه واکنش، فرم حلقوی ایجاد شده و در نهایت پرولین ساخته می‌شود.</p>
+
+          <h2 id="sec-tyrosine">تبدیل فنیل‌آلانین به تیروزین</h2>
+          <p>
+            در این مسیر، فنیل‌آلانین با یک واکنش هیدروکسیلاسیون به تیروزین تبدیل می‌شود. آنزیم این
+            واکنش <strong>فنیل‌آلانین هیدروکسیلاز</strong> است و کوآنزیم ذکرشده در جزوه
+            <strong>تتراهیدروبیوپترین</strong> است. در واکنش، تتراهیدروبیوپترین به دی‌هیدروبیوپترین
+            تبدیل می‌شود و برای بازسازی فرم تترا، آنزیم دی‌هیدروبیوپترین ردوکتاز و NADPH لازم‌اند.
+          </p>
+
+          <div class="formula-box">Phenylalanine + O₂ + Tetrahydrobiopterin → Tyrosine + H₂O + Quinonoid biopterin</div>
+
+          <div class="key-facts">
+            <div class="key-fact">
+              <div class="key-fact-label">Enzyme</div>
+              <div class="key-fact-value">Phenylalanine hydroxylase</div>
+            </div>
+            <div class="key-fact">
+              <div class="key-fact-label">Cofactor</div>
+              <div class="key-fact-value">Tetrahydrobiopterin</div>
+            </div>
+            <div class="key-fact">
+              <div class="key-fact-label">Regeneration</div>
+              <div class="key-fact-value">Dihydrobiopterin reductase + NADPH</div>
+            </div>
+          </div>
+
+          <div class="note-callout danger">
+            <div class="note-callout-title">PKU / Hyperphenylalaninemia</div>
+            <div>طبق جزوه، اگر فنیل‌آلانین نتواند به تیروزین تبدیل شود، فنیل‌آلانین افزایش می‌یابد و می‌تواند وارد مسیرهای فرعی شده و محصولات سمی ایجاد کند. جزوه بر تشخیص زودهنگام و محدودیت فنیل‌آلانین غذایی تأکید دارد.</div>
+          </div>
+
+          <h3 id="sec-hydroxy">هیدروکسی‌پروline و هیدروکسی‌لایزین</h3>
+          <p>
+            این ترکیبات با یک واکنش هیدروکسیلاسیون ایجاد می‌شوند؛ گروه OH به پرولین یا لایزین اضافه می‌شود.
+            جزوه ذکر می‌کند که آنزیم‌های هیدروکسیلاز برای عملکرد خود به آهن و ویتامین C نیاز دارند.
+          </p>
+
+          <h2 id="sec-renal">اختلالات مربوط به آمینواسیدها و پروتئین‌ها</h2>
+          <p>
+            در شرایط نرمال، آمینواسیدها از راه ادرار دفع نمی‌شوند، زیرا کلیه آن‌ها را بازجذب می‌کند.
+            متن جزوه مسیر کلی را این‌گونه جمع‌بندی می‌کند: ورود از روده و دستگاه گوارش، متابولیسم در خون،
+            و خروج از بدن عمدتاً از مسیر کلیه؛ بنابراین اختلال می‌تواند در ورود، متابولیسم یا بازجذب رخ دهد.
+          </p>
+
+          <div class="key-facts">
+            <div class="key-fact">
+              <div class="key-fact-label">ورود</div>
+              <div class="key-fact-value">روده و دستگاه گوارش</div>
+            </div>
+            <div class="key-fact">
+              <div class="key-fact-label">متابولیسم</div>
+              <div class="key-fact-value">در خون / بافت‌ها</div>
+            </div>
+            <div class="key-fact">
+              <div class="key-fact-label">بازجذب</div>
+              <div class="key-fact-value">توبول‌های کلیوی</div>
+            </div>
+          </div>
+
+          <h3 id="sec-glycinuria">Glycinuria و Hyperoxaluria</h3>
+          <p>
+            در <strong>glycinuria</strong> گلایسین از ادرار دفع می‌شود و در متن به اختلال بازجذب توبولی اشاره شده است.
+            جزوه دفع گلایسین را با تشکیل سنگ‌های اگزالاتی مرتبط می‌کند.
+          </p>
+          <p>
+            در <strong>hyperoxaluria</strong>، glyoxylate از گلایسین ایجاد می‌شود و اختلال در دفع آن در جزوه
+            با التهاب و عفونت سیستم ادراری مطرح شده است.
+          </p>
+
+          <h3 id="sec-cystinuria">Cystinuria</h3>
+          <p>
+            در این بیماری، سیستئین همراه با لایزین، آرژینین و اورنیتین دفع می‌شوند و متن تأکید می‌کند
+            که مقدار دفع سیستئین از سایر آمینواسیدهای ذکرشده بیشتر است. به علت نامحلول بودن سیستئین در آب،
+            سنگ‌های سیستئینی ایجاد می‌شوند؛ جزوه این سنگ‌ها را خوش‌خیم توصیف می‌کند.
+          </p>
+
+          <h3 id="sec-cystinosis">Cystinosis</h3>
+          <p>
+            در cystinosis نقص لیزوزومی مطرح است و کریستال‌های نامحلول سیستئین در بافت‌ها رسوب می‌کنند.
+            متن به aminoaciduria اشاره می‌کند و توضیح می‌دهد که آسیب سلول‌های کلیه می‌تواند بازجذب را مختل کرده
+            و دفع بسیاری از آمینواسیدها را از طریق ادرار افزایش دهد. در جزوه، مرگ زودرس ناشی از اختلالات شدید کلیوی ذکر شده است.
+          </p>
+
+          <h2 id="sec-histidine">متابولیسم هیستیدین</h2>
+          <p>
+            هیستیدین در جزوه آمینواسیدی با pH ایزوالکتریک نزدیک به pH رایج بدن معرفی شده و برای ساختار هموگلوبین اهمیت دارد.
+          </p>
+
+          <div class="mini-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>مرحله</th>
+                  <th>آنزیم / تغییر</th>
+                  <th>محصول</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>۱</td><td>هیستیداز</td><td>اوراکانات / Urocanic acid</td></tr>
+                <tr><td>۲</td><td>اوراکاناز</td><td>ایمیدازول پروپیونات</td></tr>
+                <tr><td>ادامهٔ مسیر</td><td>تبدیل واسطه‌ای</td><td>N-formiminoglutamate → گلوتامات</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="memory-hook">
+            <div class="memory-hook-title">HIGH-YIELD</div>
+            <div>حاصل نهایی کاتابولیسم هیستیدین در متن جزوه: <strong>گلوتامیک اسید / گلوتامات</strong>.</div>
+          </div>
+
+          <h3 id="sec-histidine-disorders">اختلالات متابولیک هیستیدین</h3>
+          <p>
+            در <strong>histidinemia</strong> مشکل در هیستیداز ایجاد می‌شود، بنابراین میزان هیستیدین افزایش می‌یابد.
+            در جزوه این افزایش با عقب‌ماندگی ذهنی مرتبط شده است.
+          </p>
+          <p>
+            در <strong>urocanic aciduria</strong> نقص اوراکاناز مطرح است و حضور اوراکانیک اسید، ایمیدازول استات
+            یا ایمیدازول پیرووات در ادرار می‌تواند نشانهٔ نقص در متابولیسم هیستیدین باشد. متن به استفاده از
+            پنل‌های ادراری برای بررسی متابولیت‌ها اشاره می‌کند.
+          </p>
+
+          <h2 id="sec-bcaa">آمینواسیدهای شاخه‌دار</h2>
+          <p>
+            والین، لوسین و ایزولوسین در کاتابولیسم مسیرهای مشترکی دارند. در متن جزوه ابتدا عامل آمینی برداشته می‌شود،
+            سپس دهیدروژناز روی آن‌ها عمل می‌کند. سه مسیر اول برای هر سه آمینواسید مشابه معرفی شده و یک کمپلکس آنزیمی مشترک مطرح می‌شود.
+          </p>
+
+          <div class="key-facts">
+            <div class="key-fact">
+              <div class="key-fact-label">BCAA</div>
+              <div class="key-fact-value">Valine · Leucine · Isoleucine</div>
+            </div>
+            <div class="key-fact">
+              <div class="key-fact-label">اصل مشترک</div>
+              <div class="key-fact-value">مسیرهای اولیهٔ مشابه</div>
+            </div>
+            <div class="key-fact">
+              <div class="key-fact-label">نکته</div>
+              <div class="key-fact-value">یک کمپلکس آنزیمی برای هر سه</div>
+            </div>
+          </div>
+
+          <h3 id="sec-msud">Maple Syrup Urine Disease</h3>
+          <p>
+            در جزوه، این بیماری با نام <strong>Maple Syrup urine disease</strong> و نیز
+            <strong>branched-chain ketonuria</strong> آمده است. ویژگی شناخته‌شده در متن، بوی شیرهٔ درخت افرا
+            یا شکر سوخته در ادرار است.
+          </p>
+          <p>
+            نقص در «alpha-ketoacid decarboxylase complex» باعث افزایش لوسین، والین، ایزولوسین و آلفاکتو اسیدها
+            می‌شود و متن از آسیب شدید مغزی، امکان مرگ و اهمیت تشخیص در هفتهٔ اول تولد سخن می‌گوید.
+          </p>
+
+          <div class="note-callout warning">
+            <div class="note-callout-title">درمان طبق جزوه</div>
+            <div>در صورت شناسایی نقص، تغذیه با شیر مخصوص محدودشده از نظر آمینواسیدهای شاخه‌دار مطرح شده است. جزوه بر غربالگری نوزادان و شروع سریع درمان برای جلوگیری از آسیب برگشت‌ناپذیر تأکید دارد.</div>
+          </div>
+
+          <h2 id="sec-enzyme-defect">شدت نقص آنزیمی</h2>
+          <p>
+            آنزیم ساختار پروتئینی دارد و دارای جایگاه فعال است. جهش می‌تواند اتصال سوبسترا به جایگاه فعال را مختل کند
+            و مقدار محصول را کاهش دهد یا متوقف کند. شدت بیماری به میزان اختلال فعالیت آنزیم وابسته است.
+          </p>
+
+          <div class="formula-box">فعالیت آنزیم ↓ → تولید محصول ↓ → شدت نقص متغیر از خفیف تا شدید</div>
+
+          <h2 id="sec-pku-types">انواع PKU و درمان</h2>
+          <p>
+            طبق اسلاید و متن جزوه، وقتی فنیل‌آلانین به تیروزین تبدیل نمی‌شود، PKU یا
+            hyperphenylalaninemia ایجاد می‌شود. نوع نقص باید مشخص شود تا درمان مناسب انتخاب شود.
+          </p>
+
+          <div class="mini-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>نوع</th>
+                  <th>نقص ذکرشده در جزوه</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>Type I</td><td>نقص فنیل‌آلانین هیدروکسیلاز</td></tr>
+                <tr><td>Type II, III</td><td>نقص دی‌هیدروبیوپترین ردوکتاز</td></tr>
+                <tr><td>Type IV, V</td><td>نقص در بیوسنتز دی‌هیدروبیوپترین</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="note-callout info">
+            <div class="note-callout-title">تفاوت درمان</div>
+            <div>
+              اگر فنیل‌آلانین هیدروکسیلاز کار نکند، طبق جزوه فنیل‌آلانین رژیم غذایی نوزاد باید حذف و تیروزین اضافه شود.
+              اگر مشکل در دی‌هیدروبیوپترین / تتراهیدروبیوپترین باشد، خود این ترکیبات می‌توانند به‌صورت مکمل مطرح شوند.
+            </div>
+          </div>
+
+          <h2 id="sec-rapid-review">مرور سریع قبل از امتحان</h2>
+
+          <div class="key-facts">
+            <div class="key-fact">
+              <div class="key-fact-label">صرفاً ketogenic</div>
+              <div class="key-fact-value">Leucine + Lysine</div>
+            </div>
+            <div class="key-fact">
+              <div class="key-fact-label">هر دو</div>
+              <div class="key-fact-value">Isoleucine + Phenylalanine + Tryptophan + Tyrosine</div>
+            </div>
+            <div class="key-fact">
+              <div class="key-fact-label">Phenylalanine → Tyrosine</div>
+              <div class="key-fact-value">Phenylalanine hydroxylase + BH4 + NADPH regeneration</div>
+            </div>
+            <div class="key-fact">
+              <div class="key-fact-label">Histidine</div>
+              <div class="key-fact-value">Histidase → Urocanate → ... → Glutamate</div>
+            </div>
+            <div class="key-fact">
+              <div class="key-fact-label">BCAA</div>
+              <div class="key-fact-value">Valine + Leucine + Isoleucine</div>
+            </div>
+            <div class="key-fact">
+              <div class="key-fact-label">MSUD</div>
+              <div class="key-fact-value">بوی شیرهٔ افرا + نقص کمپلکس ذکرشده + آسیب مغزی</div>
+            </div>
+          </div>
+
+          <div class="note-callout danger">
+            <div class="note-callout-title">مرز منبع</div>
+            <div>این جزوهٔ HTML بر اساس محتوای PDF جلسهٔ ۵ ساخته شده است. عباراتی که ممکن است در ادبیات استاندارد کتاب‌ها نام‌گذاری یا جزئیات متفاوتی داشته باشند، در این نسخه مطابق همان جزوه نگه داشته شده‌اند.</div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- TAB 2: FLASHCARDS -->
+    <section id="tab-flashcards" class="tab-content">
+      <div class="card" style="max-width: 600px; margin: 0 auto 1.5rem auto;">
+        <div style="display: flex; gap: 1rem; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+          <div style="flex: 1; min-width: 150px;">
+            <label for="fcTopicFilter" style="font-size: 0.85rem; font-weight: bold;">فیلتر مبحث:</label>
+            <select id="fcTopicFilter">
+              <option value="all">همه مباحث</option>
+              <option value="اسکلت کربنی">اسکلت کربنی</option>
+              <option value="کتوژنیک/گلوکوژنیک">کتوژنیک/گلوکوژنیک</option>
+              <option value="بیوسنتز">بیوسنتز</option>
+              <option value="PKU">PKU</option>
+              <option value="اختلالات کلیوی">اختلالات کلیوی</option>
+              <option value="هیستیدین">هیستیدین</option>
+              <option value="BCAA">BCAA</option>
+              <option value="نقص آنزیمی">نقص آنزیمی</option>
+            </select>
+          </div>
+          <div style="text-align: left; font-size: 0.9rem; color: var(--text-muted);">
+            پیشرفت: <span id="fcProgressText" style="font-weight: bold; color: var(--primary);">۰ از ۰</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="flashcard-scene" id="fcScene">
+        <div class="flashcard" id="flashcardElement">
+          <div class="flashcard-face flashcard-front">
+            <span style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.5rem;" id="fcTopicLabel">مبحث</span>
+            <p id="fcFrontText" style="font-size: 1.1rem; font-weight: 500;">متن روی کارت</p>
+            <span style="font-size: 0.75rem; color: var(--text-muted); margin-top: 1rem;">(برای دیدن پاسخ کلیک کنید)</span>
+          </div>
+          <div class="flashcard-face flashcard-back">
+            <span style="font-size: 0.8rem; color: var(--accent); margin-bottom: 0.5rem;">پاسخ و توضیحات</span>
+            <p id="fcBackText" style="font-size: 1.05rem;">متن پشت کارت</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="flashcard-controls">
+        <button class="btn btn-outline" id="fcPrevBtn">قبلی</button>
+        <button class="btn btn-danger" id="fcUnknownBtn">❌ بلد نبودم</button>
+        <button class="btn btn-success" id="fcKnownBtn">✔️ بلد بودم</button>
+        <button class="btn btn-outline" id="fcNextBtn">بعدی</button>
+      </div>
+    </section>
+
+    <!-- TAB 3: QUIZ -->
+    <section id="tab-quiz" class="tab-content">
+      <!-- Quiz Setup Panel -->
+      <div class="card" id="quizSetupPanel" style="max-width: 600px; margin: 0 auto;">
+        <h2 style="margin-bottom: 1rem; color: var(--primary);">تنظیم و شروع آزمون</h2>
+        <div class="form-group">
+          <label for="quizTopic">مبحث آزمون:</label>
+          <select id="quizTopic">
+              <option value="all">همه مباحث</option>
+              <option value="اسکلت کربنی">اسکلت کربنی</option>
+              <option value="کتوژنیک/گلوکوژنیک">کتوژنیک/گلوکوژنیک</option>
+              <option value="بیوسنتز">بیوسنتز</option>
+              <option value="PKU">PKU</option>
+              <option value="اختلالات کلیوی">اختلالات کلیوی</option>
+              <option value="هیستیدین">هیستیدین</option>
+              <option value="BCAA">BCAA</option>
+              <option value="نقص آنزیمی">نقص آنزیمی</option>
+            </select>
+        </div>
+        <div class="form-group">
+          <label for="quizDiff">سطح دشواری:</label>
+          <select id="quizDiff">
+            <option value="all">همه سطوح</option>
+            <option value="آسان">آسان</option>
+            <option value="متوسط">متوسط</option>
+            <option value="دشوار">دشوار</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="quizCount">تعداد سؤالات:</label>
+          <input type="number" id="quizCount" value="5" min="1" max="20">
+        </div>
+        <button class="btn" id="btnStartQuiz" style="width: 100%; margin-top: 0.5rem;">شروع آزمون</button>
+      </div>
+
+      <!-- Quiz Active Area -->
+      <div id="quizActiveArea" style="display: none; max-width: 700px; margin: 0 auto;">
+        <div class="card" style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1.25rem;">
+          <span id="quizQuestionTracker" style="font-weight: bold; color: var(--text-muted);">سؤال ۱ از ۵</span>
+          <button class="btn-icon" id="btnBookmarkQuiz" title="نشان‌کردن سؤال">🔖 <span id="bookmarkLabel">نشان کردن</span></button>
+        </div>
+
+        <div class="card" id="quizQuestionCard">
+          <div id="quizQuestionHeader" style="margin-bottom: 1rem;">
+            <span id="quizBadgeTopic" style="background: var(--primary-light); color: var(--primary); padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.8rem; margin-left: 0.5rem;">مبحث</span>
+            <span id="quizBadgeDiff" style="background: var(--border-color); color: var(--text-muted); padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.8rem;">سطح</span>
+          </div>
+          <h3 id="quizQuestionPrompt" style="margin-bottom: 1.25rem; font-size: 1.1rem; line-height: 1.5;">صورت سؤال اینجا قرار می‌گیرد</h3>
+
+          <div id="quizInteractiveContainer"></div>
+
+          <div id="quizExplanationBox" class="explanation-box" style="display: none;"></div>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; gap: 1rem;">
+          <button class="btn btn-outline" id="btnQuizPrev">سؤال قبلی</button>
+          <button class="btn" id="btnQuizNext">سؤال بعدی</button>
+        </div>
+      </div>
+
+      <!-- Quiz Result Summary -->
+      <div id="quizResultPanel" class="card" style="display: none; max-width: 650px; margin: 0 auto; text-align: center;">
+        <h2 style="color: var(--primary); margin-bottom: 0.5rem;">کارنامه آزمون</h2>
+        <p style="font-size: 1.25rem; margin-bottom: 1.5rem;">درصد کل شما: <span id="quizFinalScore" style="font-weight: bold; color: var(--accent);">۰%</span></p>
+
+        <div style="text-align: right; margin-bottom: 1.5rem;">
+          <h3>مرور اشتباهات:</h3>
+          <div id="quizMistakesList" style="margin-top: 0.75rem; font-size: 0.9rem;"></div>
+        </div>
+
+        <button class="btn" id="btnRestartQuiz">آزمون مجدد</button>
+      </div>
+    </section>
+
+    <!-- TAB 4: ANALYTICS -->
+    <section id="tab-analytics" class="tab-content">
+      <div class="card">
+        <h2>تحلیل عملکرد و پیشرفت</h2>
+        <p style="color: var(--text-muted); margin-bottom: 1.5rem;">آمار پاسخ‌دهی به سؤالات آزمون در حافظه مرورگر</p>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+          <div class="card" style="text-align: center; border-color: var(--primary-light);">
+            <div style="font-size: 0.85rem; color: var(--text-muted);">کل سؤالات پاسخ‌داده‌شده</div>
+            <div id="statTotalAnswered" style="font-size: 1.75rem; font-weight: bold; color: var(--primary); margin-top: 0.25rem;">۰</div>
+          </div>
+          <div class="card" style="text-align: center; border-color: var(--primary-light);">
+            <div style="font-size: 0.85rem; color: var(--text-muted);">درصد کل موفقیت</div>
+            <div id="statOverallAccuracy" style="font-size: 1.75rem; font-weight: bold; color: var(--accent); margin-top: 0.25rem;">۰%</div>
+          </div>
+        </div>
+
+        <h3 style="margin-bottom: 0.75rem;">عملکرد به تفکیک مبحث</h3>
+        <div id="topicChartContainer" class="bar-chart-container"></div>
+
+        <h3 style="margin: 1.5rem 0 0.75rem 0;">عملکرد به تفکیک سطح دشواری</h3>
+        <div id="diffChartContainer" class="bar-chart-container"></div>
+
+        <h3 style="margin: 1.5rem 0 0.75rem 0;">سؤالات با پاسخ غلط اخیر</h3>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>سؤال</th>
+                <th>پاسخ شما</th>
+                <th>پاسخ صحیح</th>
+              </tr>
+            </thead>
+            <tbody id="mistakesTableBody">
+              <tr>
+                <td colspan="3" style="text-align: center; color: var(--text-muted);">هیچ سابقه خطایی ثبت نشده است.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div style="margin-top: 2rem; border-top: 1px solid var(--border-color); padding-top: 1rem; text-align: left;">
+          <button class="btn btn-danger" id="btnResetAnalytics">بازنشانی کامل پیشرفت</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer style="width:min(var(--content-width),calc(100% - 28px));margin:0 auto 30px;text-align:center;color:var(--text-3);font-size:.72rem;">
+    HTML Study Note Blueprint · reusable educational UI system
+  </footer>
+
+
+  <div style="width:min(var(--content-width),calc(100% - 28px));margin:0 auto 20px;padding:10px 14px;border:1px solid var(--border);border-radius:12px;background:var(--surface);color:var(--text-2);font-size:.76rem;text-align:center;">
+    مبنا: PDF «متابولیسم پروتئین — جلسه ۵» · محتوای آموزشی، فلش‌کارت‌ها و سؤالات این فایل از همان منبع ساخته شده‌اند.
+  </div>
+
+  <!-- SETTINGS MODAL -->
+  <div class="modal-overlay" id="settingsModal">
+    <div class="modal-card">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+        <h3 style="color: var(--primary);">تنظیمات و پشتیبان‌گیری</h3>
+        <button class="btn-icon" id="btnCloseSettingsModal" style="border: none; font-size: 1.1rem;">✕</button>
+      </div>
+
+      <div class="form-group">
+        <label for="themeSelect">پوسته (تم):</label>
+        <select id="themeSelect">
+          <option value="light">روشن</option>
+          <option value="dark">تیره</option>
+          <option value="sepia">سپیا (کتابی)</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="fontSizeSelect">اندازه فونت متن:</label>
+        <select id="fontSizeSelect">
+          <option value="small">کوچک</option>
+          <option value="medium">متوسط</option>
+          <option value="large">بزرگ</option>
+        </select>
+      </div>
+
+      <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 1.25rem 0;">
+
+      <div class="form-group">
+        <label>پشتیبان‌گیری داده‌ها (JSON):</label>
+        <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
+          <button class="btn btn-outline" id="btnExportJSON" style="flex: 1;">صدور پشتیبان JSON</button>
+          <label class="btn btn-outline" style="flex: 1; text-align: center; cursor: pointer;">
+            بازخوانی فایل
+            <input type="file" id="importFileInput" accept=".json" style="display: none;">
+          </label>
+        </div>
+      </div>
+
+      <div style="margin-top: 1.5rem; text-align: left;">
+        <button class="btn" id="btnSaveSettings">بستن</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // --- Safe Storage Helper (localStorage with memory fallback) ---
+    window.__memoryStore = window.__memoryStore || {};
+    const Storage = {
+      getItem: function(key) {
+        try {
+          return window.localStorage.getItem(key);
+        } catch (e) {
+          return window.__memoryStore[key] || null;
+        }
+      },
+      setItem: function(key, val) {
+        try {
+          window.localStorage.setItem(key, val);
+        } catch (e) {
+          window.__memoryStore[key] = String(val);
+        }
+      },
+      removeItem: function(key) {
+        try {
+          window.localStorage.removeItem(key);
+        } catch (e) {
+          delete window.__memoryStore[key];
+        }
+      }
+    };
+
+    // --- Content Bank Placeholder ---
+    const flashcardsData = [
+  {
+    "id": "fc_1",
+    "topic": "اسکلت کربنی",
+    "front": "پس از حذف عامل آمین، اسکلت کربنی آمینواسیدها معمولاً وارد کدام شاهراه متابولیک می‌شود؟",
+    "back": "سیکل کربس."
+  },
+  {
+    "id": "fc_2",
+    "topic": "اسکلت کربنی",
+    "front": "در جزوه، محصولات احیایی مهم سیکل کربس که از طریق زنجیره تنفسی به ATP مربوط می‌شوند کدام‌اند؟",
+    "back": "NADH و FADH."
+  },
+  {
+    "id": "fc_3",
+    "topic": "کتوژنیک/گلوکوژنیک",
+    "front": "آمینواسیدهای صرفاً کتوژنیک کدام‌اند؟",
+    "back": "لوسین و لایزین."
+  },
+  {
+    "id": "fc_4",
+    "topic": "کتوژنیک/گلوکوژنیک",
+    "front": "چهار آمینواسید هم کتوژنیک و هم گلوکوژنیک کدام‌اند؟",
+    "back": "ایزولوسین، فنیل‌آلانین، تریپتوفان و تیروزین."
+  },
+  {
+    "id": "fc_5",
+    "topic": "کتوژنیک/گلوکوژنیک",
+    "front": "طبق جزوه، آمینواسیدهای کتوژنیک می‌توانند چه محصولات کربنی‌ای بسازند؟",
+    "back": "پیرووات، استیل‌کوآنزیم A و استواستیل‌کوآنزیم A."
+  },
+  {
+    "id": "fc_6",
+    "topic": "کتوژنیک/گلوکوژنیک",
+    "front": "آمینواسیدهای گلوکوژنیک از چه جایگاه‌هایی می‌توانند به سیکل کربس برسند؟",
+    "back": "پیرووات، آلفاکتوگلوتارات، سوکسینیل‌کوآنزیم A، فومارات و اگزالواستات."
+  },
+  {
+    "id": "fc_7",
+    "topic": "اسکلت کربنی",
+    "front": "آسپارژین و آسپارتیک اسید طبق جزوه از طریق کدام ترکیب به سیکل کربس می‌رسند؟",
+    "back": "اگزالواستات."
+  },
+  {
+    "id": "fc_8",
+    "topic": "اسکلت کربنی",
+    "front": "جزوه سیکل کربس را با چه تعبیر مفهومی معرفی می‌کند؟",
+    "back": "شاهراه متابولیک."
+  },
+  {
+    "id": "fc_9",
+    "topic": "بیوسنتز",
+    "front": "آمینواسیدهای ضروری چگونه تعریف شده‌اند؟",
+    "back": "در شرایط نرمال باید از مواد غذایی دریافت شوند."
+  },
+  {
+    "id": "fc_10",
+    "topic": "بیوسنتز",
+    "front": "آمینواسیدهای غیرضروری چگونه تعریف شده‌اند؟",
+    "back": "در بدن با کمک واکنش‌های متابولیک ساخته می‌شوند."
+  },
+  {
+    "id": "fc_11",
+    "topic": "بیوسنتز",
+    "front": "طبق جزوه برای ساخت مجموعهٔ آمینواسیدهای غیرضروری چند آنزیم ذکر شده است؟",
+    "back": "۱۷ آنزیم."
+  },
+  {
+    "id": "fc_12",
+    "topic": "بیوسنتز",
+    "front": "طبق جزوه برای ساخت آمینواسیدهای ضروری چند آنزیم ذکر شده است؟",
+    "back": "۵۹ آنزیم."
+  },
+  {
+    "id": "fc_13",
+    "topic": "بیوسنتز",
+    "front": "آلفاکتوگلوتارات با دریافت عامل آمین به چه آمینواسیدی تبدیل می‌شود؟",
+    "back": "گلوتامیک اسید."
+  },
+  {
+    "id": "fc_14",
+    "topic": "بیوسنتز",
+    "front": "آنزیم ذکرشده برای تبدیل آلفاکتوگلوتارات به گلوتامیک اسید چیست؟",
+    "back": "گلوتامات دهیدروژناز."
+  },
+  {
+    "id": "fc_15",
+    "topic": "بیوسنتز",
+    "front": "گلوتامیک اسید با دریافت آمونیاک و به کمک کدام آنزیم به گلوتامین تبدیل می‌شود؟",
+    "back": "گلوتامین سنتاز."
+  },
+  {
+    "id": "fc_16",
+    "topic": "بیوسنتز",
+    "front": "آسپارتیک اسید با دریافت عامل آمین به چه ترکیبی تبدیل می‌شود؟",
+    "back": "آسپاراژین."
+  },
+  {
+    "id": "fc_17",
+    "topic": "بیوسنتز",
+    "front": "آنزیم ساخت آسپاراژین طبق جزوه چیست؟",
+    "back": "آسپاراژین سنتاز."
+  },
+  {
+    "id": "fc_18",
+    "topic": "بیوسنتز",
+    "front": "افزودن عامل آمین به پیرووات چه محصولی می‌دهد؟",
+    "back": "آلانین."
+  },
+  {
+    "id": "fc_19",
+    "topic": "بیوسنتز",
+    "front": "سرین از کدام ترکیب مسیر گلیکولیز ساخته می‌شود؟",
+    "back": "فسفوگلیسرات."
+  },
+  {
+    "id": "fc_20",
+    "topic": "بیوسنتز",
+    "front": "سرین می‌تواند به چه دو آمینواسید مهمی در ادامهٔ مسیر تبدیل شود؟",
+    "back": "گلایسین و سیستئین."
+  },
+  {
+    "id": "fc_21",
+    "topic": "بیوسنتز",
+    "front": "سیستاتیونین توسط کدام آنزیم ساخته می‌شود؟",
+    "back": "سیستاتیونین سنتاز."
+  },
+  {
+    "id": "fc_22",
+    "topic": "بیوسنتز",
+    "front": "سیستاتیونین توسط کدام آنزیم شکسته می‌شود؟",
+    "back": "سیستاتیوناز."
+  },
+  {
+    "id": "fc_23",
+    "topic": "بیوسنتز",
+    "front": "پرولین طبق جزوه از کدام آمینواسید و طی چند واکنش ساخته می‌شود؟",
+    "back": "از گلوتامیک اسید و طی ۳ واکنش."
+  },
+  {
+    "id": "fc_24",
+    "topic": "PKU",
+    "front": "آنزیم تبدیل فنیل‌آلانین به تیروزین چیست؟",
+    "back": "فنیل‌آلانین هیدروکسیلاز."
+  },
+  {
+    "id": "fc_25",
+    "topic": "PKU",
+    "front": "کوآنزیم فنیل‌آلانین هیدروکسیلاز در جزوه چیست؟",
+    "back": "تتراهیدروبیوپترین."
+  },
+  {
+    "id": "fc_26",
+    "topic": "PKU",
+    "front": "تتراهیدروبیوپترین پس از واکنش به چه فرم اکسیدشده‌ای تبدیل می‌شود؟",
+    "back": "دی‌هیدروبیوپترین."
+  },
+  {
+    "id": "fc_27",
+    "topic": "PKU",
+    "front": "برای بازسازی تتراهیدروبیوپترین کدام آنزیم مطرح شده است؟",
+    "back": "دی‌هیدروبیوپترین ردوکتاز."
+  },
+  {
+    "id": "fc_28",
+    "topic": "PKU",
+    "front": "کوآنزیم دی‌هیدروبیوپترین ردوکتاز چیست؟",
+    "back": "NADPH."
+  },
+  {
+    "id": "fc_29",
+    "topic": "PKU",
+    "front": "نقص مسیر فنیل‌آلانین به تیروزین با چه نام‌هایی مطرح شده است؟",
+    "back": "PKU یا hyperphenylalaninemia."
+  },
+  {
+    "id": "fc_30",
+    "topic": "PKU",
+    "front": "در PKU اگر فنیل‌آلانین به تیروزین تبدیل نشود چه اتفاقی برای فنیل‌آلانین رخ می‌دهد؟",
+    "back": "افزایش می‌یابد و می‌تواند وارد مسیرهای فرعی شود."
+  },
+  {
+    "id": "fc_31",
+    "topic": "PKU",
+    "front": "در Type I PKU چه آنزیمی دچار نقص است؟",
+    "back": "فنیل‌آلانین هیدروکسیلاز."
+  },
+  {
+    "id": "fc_32",
+    "topic": "PKU",
+    "front": "در Type II و III PKU طبق جزوه چه آنزیمی دچار نقص است؟",
+    "back": "دی‌هیدروبیوپترین ردوکتاز."
+  },
+  {
+    "id": "fc_33",
+    "topic": "PKU",
+    "front": "Type IV و V PKU در جزوه به چه نقصی نسبت داده شده‌اند؟",
+    "back": "نقص در بیوسنتز دی‌هیدروبیوپترین."
+  },
+  {
+    "id": "fc_34",
+    "topic": "اختلالات",
+    "front": "در شرایط نرمال آمینواسیدها چرا از طریق ادرار دفع نمی‌شوند؟",
+    "back": "به دلیل بازجذب کلیوی آن‌ها."
+  },
+  {
+    "id": "fc_35",
+    "topic": "اختلالات",
+    "front": "Glycinuria به چه اختلالی نسبت داده شده است؟",
+    "back": "اختلال در بازجذب توبولی گلایسین."
+  },
+  {
+    "id": "fc_36",
+    "topic": "اختلالات",
+    "front": "Cystinuria کدام گروه از آمینواسیدها را درگیر می‌کند؟",
+    "back": "سیستئین، لایزین، آرژینین و اورنیتین."
+  },
+  {
+    "id": "fc_37",
+    "topic": "اختلالات",
+    "front": "چرا در cystinuria سنگ تشکیل می‌شود؟",
+    "back": "به علت نامحلول بودن سیستئین در آب."
+  },
+  {
+    "id": "fc_38",
+    "topic": "اختلالات",
+    "front": "Cystinosis چه نوع نقص سلولی را مطرح می‌کند؟",
+    "back": "نقص لیزوزومی و تجمع کریستال‌های نامحلول سیستئین."
+  },
+  {
+    "id": "fc_39",
+    "topic": "هیستیدین",
+    "front": "اولین آنزیم کاتابولیسم هیستیدین چیست؟",
+    "back": "هیستیداز."
+  },
+  {
+    "id": "fc_40",
+    "topic": "هیستیدین",
+    "front": "محصول مرحلهٔ اول کاتابولیسم هیستیدین چیست؟",
+    "back": "اوراکانات یا urocanic acid."
+  },
+  {
+    "id": "fc_41",
+    "topic": "هیستیدین",
+    "front": "آنزیم مرحلهٔ دوم کاتابولیسم هیستیدین چیست؟",
+    "back": "اوراکاناز."
+  },
+  {
+    "id": "fc_42",
+    "topic": "هیستیدین",
+    "front": "حاصل نهایی کاتابولیسم هیستیدین در جزوه چیست؟",
+    "back": "گلوتامیک اسید / گلوتامات."
+  },
+  {
+    "id": "fc_43",
+    "topic": "BCAA",
+    "front": "سه آمینواسید شاخه‌دار کدام‌اند؟",
+    "back": "والین، لوسین و ایزولوسین."
+  },
+  {
+    "id": "fc_44",
+    "topic": "BCAA",
+    "front": "کاتابولیسم اولیهٔ BCAAها چه ویژگی مشترکی دارد؟",
+    "back": "مسیرهای اولیه برای هر سه مشابه است و یک کمپلکس آنزیمی مشترک مطرح شده است."
+  },
+  {
+    "id": "fc_45",
+    "topic": "BCAA",
+    "front": "نام بیماری ناشی از نقص متابولیسم BCAAها در جزوه چیست؟",
+    "back": "Maple Syrup Urine Disease."
+  },
+  {
+    "id": "fc_46",
+    "topic": "BCAA",
+    "front": "ویژگی بویایی معروف MSUD چیست؟",
+    "back": "بوی شیرهٔ درخت افرا یا شکر سوخته در ادرار."
+  },
+  {
+    "id": "fc_47",
+    "topic": "BCAA",
+    "front": "در MSUD چه موادی افزایش می‌یابند؟",
+    "back": "لوسین، والین، ایزولوسین و آلفاکتو اسیدها."
+  },
+  {
+    "id": "fc_48",
+    "topic": "BCAA",
+    "front": "جزوه بر تشخیص MSUD در چه زمانی تأکید دارد؟",
+    "back": "خیلی زود، همان هفتهٔ اول تولد."
+  },
+  {
+    "id": "fc_49",
+    "topic": "نقص آنزیمی",
+    "front": "جهش در آنزیم چگونه می‌تواند باعث بیماری شود؟",
+    "back": "با مختل کردن اتصال سوبسترا به جایگاه فعال و کاهش تولید محصول."
+  },
+  {
+    "id": "fc_50",
+    "topic": "نقص آنزیمی",
+    "front": "شدت بیماری ناشی از نقص آنزیمی به چه چیزی وابسته است؟",
+    "back": "به میزان کاهش فعالیت آنزیم."
+  }
+];
+
+    const questionsData = [
+  {
+    "id": "q1",
+    "type": "mcq",
+    "topic": "کتوژنیک/گلوکوژنیک",
+    "difficulty": "آسان",
+    "question": "کدام آمینواسید در جزوه صرفاً کتوژنیک معرفی شده است؟",
+    "options": [
+      "ایزولوسین",
+      "لوسین",
+      "تیروزین",
+      "فنیل‌آلانین"
+    ],
+    "answer": 1,
+    "explanation": "لوسین و لایزین در جزوه صرفاً کتوژنیک معرفی شده‌اند."
+  },
+  {
+    "id": "q2",
+    "type": "mcq",
+    "topic": "کتوژنیک/گلوکوژنیک",
+    "difficulty": "آسان",
+    "question": "کدام مجموعه شامل هر چهار آمینواسید هم کتوژنیک و هم گلوکوژنیک است؟",
+    "options": [
+      "لوسین، لایزین، والین، آلانین",
+      "ایزولوسین، فنیل‌آلانین، تریپتوفان، تیروزین",
+      "گلوتامین، گلایسین، سرین، سیستئین",
+      "والین، لوسین، ایزولوسین، لایزین"
+    ],
+    "answer": 1,
+    "explanation": "این چهار مورد دقیقاً در متن جزوه ذکر شده‌اند."
+  },
+  {
+    "id": "q3",
+    "type": "mcq",
+    "topic": "اسکلت کربنی",
+    "difficulty": "متوسط",
+    "question": "آسپارژین و آسپارتیک اسید طبق جزوه از طریق کدام ترکیب به سیکل کربس می‌رسند؟",
+    "options": [
+      "استیل-CoA",
+      "سوکسینیل-CoA",
+      "اگزالواستات",
+      "فومارات"
+    ],
+    "answer": 2,
+    "explanation": "در متن جزوه برای آسپارژین و آسپارتیک اسید، اگزالواستات به‌عنوان مسیر ورود ذکر شده است."
+  },
+  {
+    "id": "q4",
+    "type": "truefalse",
+    "topic": "اسکلت کربنی",
+    "difficulty": "آسان",
+    "question": "سیکل کربس در جزوه به‌عنوان یک شاهراه متابولیک توصیف شده است.",
+    "answer": true,
+    "explanation": "این تعبیر صریحاً در متن آمده است."
+  },
+  {
+    "id": "q5",
+    "type": "mcq",
+    "topic": "بیوسنتز",
+    "difficulty": "آسان",
+    "question": "آنزیم تبدیل آلفاکتوگلوتارات به گلوتامیک اسید کدام است؟",
+    "options": [
+      "گلوتامین سنتاز",
+      "گلوتامات دهیدروژناز",
+      "آسپاراژین سنتاز",
+      "سیستاتیوناز"
+    ],
+    "answer": 1,
+    "explanation": "جزوه این واکنش را با گلوتامات دهیدروژناز معرفی می‌کند."
+  },
+  {
+    "id": "q6",
+    "type": "mcq",
+    "topic": "بیوسنتز",
+    "difficulty": "متوسط",
+    "question": "گلوتامیک اسید با دریافت آمونیاک به کمک کدام آنزیم به گلوتامین تبدیل می‌شود؟",
+    "options": [
+      "گلوتامات دهیدروژناز",
+      "فنیل‌آلانین هیدروکسیلاز",
+      "گلوتامین سنتاز",
+      "اوراکاناز"
+    ],
+    "answer": 2,
+    "explanation": "گلوتامین سنتاز در جزوه برای این تبدیل ذکر شده است."
+  },
+  {
+    "id": "q7",
+    "type": "mcq",
+    "topic": "بیوسنتز",
+    "difficulty": "آسان",
+    "question": "افزودن عامل آمین به پیرووات چه محصولی ایجاد می‌کند؟",
+    "options": [
+      "آلانین",
+      "آسپارتات",
+      "گلوتامین",
+      "سرین"
+    ],
+    "answer": 0,
+    "explanation": "در متن جزوه پیرووات + عامل آمین → آلانین آمده است."
+  },
+  {
+    "id": "q8",
+    "type": "truefalse",
+    "topic": "بیوسنتز",
+    "difficulty": "آسان",
+    "question": "سرین در جزوه از فسفوگلیسرات ساخته می‌شود.",
+    "answer": true,
+    "explanation": "فسفوگلیسرات به‌عنوان پیش‌ساز سرین معرفی شده است."
+  },
+  {
+    "id": "q9",
+    "type": "mcq",
+    "topic": "بیوسنتز",
+    "difficulty": "متوسط",
+    "question": "کدام آنزیم سیستاتیونین را از سرین و هموسیستئین می‌سازد؟",
+    "options": [
+      "سیستاتیونین سنتاز",
+      "سیستاتیوناز",
+      "آسپاراژین سنتاز",
+      "هیستیداز"
+    ],
+    "answer": 0,
+    "explanation": "در جزوه، سیستاتیونین سنتاز مسئول ساخت سیستاتیونین معرفی شده است."
+  },
+  {
+    "id": "q10",
+    "type": "mcq",
+    "topic": "PKU",
+    "difficulty": "آسان",
+    "question": "آنزیم تبدیل فنیل‌آلانین به تیروزین کدام است؟",
+    "options": [
+      "دی‌هیدروبیوپترین ردوکتاز",
+      "فنیل‌آلانین هیدروکسیلاز",
+      "هیستیداز",
+      "گلوتامات دهیدروژناز"
+    ],
+    "answer": 1,
+    "explanation": "واکنش اصلی با phenylalanine hydroxylase انجام می‌شود."
+  },
+  {
+    "id": "q11",
+    "type": "mcq",
+    "topic": "PKU",
+    "difficulty": "آسان",
+    "question": "کوآنزیم اصلی فنیل‌آلانین هیدروکسیلاز طبق جزوه چیست؟",
+    "options": [
+      "NADPH",
+      "تتراهیدروبیوپترین",
+      "ویتامین C",
+      "آهن"
+    ],
+    "answer": 1,
+    "explanation": "جزوه تتراهیدروبیوپترین را برای این واکنش ذکر می‌کند."
+  },
+  {
+    "id": "q12",
+    "type": "mcq",
+    "topic": "PKU",
+    "difficulty": "متوسط",
+    "question": "برای بازسازی تتراهیدروبیوپترین کدام ترکیب و آنزیم لازم‌اند؟",
+    "options": [
+      "NADPH + دی‌هیدروبیوپترین ردوکتاز",
+      "ATP + گلوتامین سنتاز",
+      "ویتامین C + هیدروکسیلاز",
+      "FADH + هیستیداز"
+    ],
+    "answer": 0,
+    "explanation": "دی‌هیدروبیوپترین ردوکتاز با NADPH فرم تترا را بازسازی می‌کند."
+  },
+  {
+    "id": "q13",
+    "type": "truefalse",
+    "topic": "PKU",
+    "difficulty": "آسان",
+    "question": "در Type I PKU نقص در فنیل‌آلانین هیدروکسیلاز است.",
+    "answer": true,
+    "explanation": "این ویژگی در صفحهٔ انواع PKU ذکر شده است."
+  },
+  {
+    "id": "q14",
+    "type": "mcq",
+    "topic": "PKU",
+    "difficulty": "دشوار",
+    "question": "Type II و III PKU در جزوه به نقص کدام آنزیم نسبت داده شده‌اند؟",
+    "options": [
+      "فنیل‌آلانین هیدروکسیلاز",
+      "دی‌هیدروبیوپترین ردوکتاز",
+      "هیستیداز",
+      "سیستاتیونین سنتاز"
+    ],
+    "answer": 1,
+    "explanation": "در متن Type II و III با نقص dihydrobiopterin reductase آمده‌اند."
+  },
+  {
+    "id": "q15",
+    "type": "mcq",
+    "topic": "PKU",
+    "difficulty": "متوسط",
+    "question": "اگر Type I PKU وجود داشته باشد، طبق جزوه کدام رویکرد غذایی مطرح است؟",
+    "options": [
+      "افزایش فنیل‌آلانین و کاهش تیروزین",
+      "حذف فنیل‌آلانین و اضافه کردن تیروزین",
+      "حذف تیروزین و اضافه کردن فنیل‌آلانین",
+      "فقط اضافه کردن NADPH"
+    ],
+    "answer": 1,
+    "explanation": "جزوه حذف فنیل‌آلانین غذایی و افزودن تیروزین را مطرح می‌کند."
+  },
+  {
+    "id": "q16",
+    "type": "mcq",
+    "topic": "اختلالات کلیوی",
+    "difficulty": "آسان",
+    "question": "در شرایط نرمال، چرا آمینواسیدها در ادرار دیده نمی‌شوند؟",
+    "options": [
+      "تولید نمی‌شوند",
+      "کلیه آن‌ها را بازجذب می‌کند",
+      "همه در کبد تخریب می‌شوند",
+      "از ریه دفع می‌شوند"
+    ],
+    "answer": 1,
+    "explanation": "بازجذب توبولی عامل اصلی ذکرشده در جزوه است."
+  },
+  {
+    "id": "q17",
+    "type": "mcq",
+    "topic": "اختلالات کلیوی",
+    "difficulty": "متوسط",
+    "question": "Glycinuria در جزوه بیشتر به کدام مشکل مربوط شده است؟",
+    "options": [
+      "اختلال در سنتز گلایسین",
+      "اختلال بازجذب توبولی گلایسین",
+      "نقص هیستیداز",
+      "نقص فنیل‌آلانین هیدروکسیلاز"
+    ],
+    "answer": 1,
+    "explanation": "در glycinuria بازجذب گلایسین در توبول‌های کلیوی مختل می‌شود."
+  },
+  {
+    "id": "q18",
+    "type": "truefalse",
+    "topic": "اختلالات کلیوی",
+    "difficulty": "متوسط",
+    "question": "در cystinuria فقط سیستئین دفع می‌شود و آمینواسیدهای دیگری درگیر نیستند.",
+    "answer": false,
+    "explanation": "سیستئین همراه با لایزین، آرژینین و اورنیتین در متن مطرح شده است."
+  },
+  {
+    "id": "q19",
+    "type": "mcq",
+    "topic": "اختلالات کلیوی",
+    "difficulty": "متوسط",
+    "question": "علت تشکیل سنگ در cystinuria طبق جزوه چیست؟",
+    "options": [
+      "محلول‌پذیری بالای سیستئین",
+      "نامحلول بودن سیستئین در آب",
+      "افزایش فنیل‌آلانین",
+      "کاهش گلوتامات"
+    ],
+    "answer": 1,
+    "explanation": "نامحلول بودن سیستئین در آب علت تشکیل سنگ‌های سیستئینی ذکر شده است."
+  },
+  {
+    "id": "q20",
+    "type": "mcq",
+    "topic": "اختلالات کلیوی",
+    "difficulty": "دشوار",
+    "question": "Cystinosis در جزوه با کدام فرآیند مرتبط است؟",
+    "options": [
+      "نقص لیزوزومی و تجمع کریستال‌های سیستئین",
+      "افزایش ساخت اوره",
+      "نقص ترانس‌آمیناسیون پیرووات",
+      "افزایش ساخت تیروزین"
+    ],
+    "answer": 0,
+    "explanation": "نقص لیزوزومی و تجمع کریستال‌های نامحلول سیستئین در متن آمده است."
+  },
+  {
+    "id": "q21",
+    "type": "mcq",
+    "topic": "هیستیدین",
+    "difficulty": "آسان",
+    "question": "اولین آنزیم کاتابولیسم هیستیدین کدام است؟",
+    "options": [
+      "اوراکاناز",
+      "هیستیداز",
+      "دی‌هیدروبیوپترین ردوکتاز",
+      "گلوتامات دهیدروژناز"
+    ],
+    "answer": 1,
+    "explanation": "هیستیداز به‌عنوان آنزیم اول معرفی شده است."
+  },
+  {
+    "id": "q22",
+    "type": "mcq",
+    "topic": "هیستیدین",
+    "difficulty": "متوسط",
+    "question": "محصول مستقیم هیستیداز در جزوه چیست؟",
+    "options": [
+      "گلوتامات",
+      "اوراکانات",
+      "ایمیدازول پیرووات",
+      "تیروزین"
+    ],
+    "answer": 1,
+    "explanation": "هیستیداز، هیستیدین را به اوراکانات تبدیل می‌کند."
+  },
+  {
+    "id": "q23",
+    "type": "mcq",
+    "topic": "هیستیدین",
+    "difficulty": "متوسط",
+    "question": "نقص اوراکاناز با کدام اختلال در متن مرتبط است؟",
+    "options": [
+      "Histidinemia",
+      "Urocanic aciduria",
+      "Cystinuria",
+      "MSUD"
+    ],
+    "answer": 1,
+    "explanation": "نقص اوراکاناز در بخش urocanic aciduria مطرح شده است."
+  },
+  {
+    "id": "q24",
+    "type": "mcq",
+    "topic": "هیستیدین",
+    "difficulty": "آسان",
+    "question": "حاصل نهایی کاتابولیسم هیستیدین در جزوه چیست؟",
+    "options": [
+      "آلانین",
+      "گلوتامات",
+      "تیروزین",
+      "اگزالواستات"
+    ],
+    "answer": 1,
+    "explanation": "متن جزوه حاصل نهایی را گلوتامیک اسید / گلوتامات بیان می‌کند."
+  },
+  {
+    "id": "q25",
+    "type": "mcq",
+    "topic": "BCAA",
+    "difficulty": "آسان",
+    "question": "کدام مجموعه سه آمینواسید شاخه‌دار را تشکیل می‌دهد؟",
+    "options": [
+      "والین، لوسین، ایزولوسین",
+      "لوسین، لایزین، تیروزین",
+      "آلانین، گلایسین، سرین",
+      "فنیل‌آلانین، تیروزین، تریپتوفان"
+    ],
+    "answer": 0,
+    "explanation": "BCAAها در جزوه والین، لوسین و ایزولوسین هستند."
+  },
+  {
+    "id": "q26",
+    "type": "truefalse",
+    "topic": "BCAA",
+    "difficulty": "متوسط",
+    "question": "مسیرهای اولیهٔ کاتابولیسم هر سه BCAA در جزوه مشترک معرفی شده‌اند.",
+    "answer": true,
+    "explanation": "متن بر مسیرهای مشترک و یک کمپلکس آنزیمی مشترک تأکید دارد."
+  },
+  {
+    "id": "q27",
+    "type": "mcq",
+    "topic": "BCAA",
+    "difficulty": "آسان",
+    "question": "نام بیماری مرتبط با نقص متابولیسم BCAAها در جزوه چیست؟",
+    "options": [
+      "PKU",
+      "Maple Syrup Urine Disease",
+      "Histidinemia",
+      "Glycinuria"
+    ],
+    "answer": 1,
+    "explanation": "این بیماری به‌عنوان Maple Syrup urine disease معرفی شده است."
+  },
+  {
+    "id": "q28",
+    "type": "mcq",
+    "topic": "BCAA",
+    "difficulty": "آسان",
+    "question": "ویژگی کلاسیک MSUD در متن چیست؟",
+    "options": [
+      "بوی ماهی در ادرار",
+      "بوی شیرهٔ درخت افرا یا شکر سوخته",
+      "بی‌رنگ شدن ادرار",
+      "تشکیل مستقیم اوره"
+    ],
+    "answer": 1,
+    "explanation": "نام بیماری از بوی ادرار گرفته شده است."
+  },
+  {
+    "id": "q29",
+    "type": "mcq",
+    "topic": "BCAA",
+    "difficulty": "دشوار",
+    "question": "در MSUD طبق جزوه کدام موارد افزایش می‌یابند؟",
+    "options": [
+      "فقط تیروزین",
+      "لوسین، والین، ایزولوسین و آلفاکتو اسیدها",
+      "فقط گلوتامات",
+      "فقط فنیل‌آلانین"
+    ],
+    "answer": 1,
+    "explanation": "این چهار گروه در متن افزایش‌یافته ذکر شده‌اند."
+  },
+  {
+    "id": "q30",
+    "type": "mcq",
+    "topic": "BCAA",
+    "difficulty": "متوسط",
+    "question": "جزوه بر شناسایی MSUD در چه زمانی تأکید دارد؟",
+    "options": [
+      "پس از بلوغ",
+      "در هفتهٔ اول تولد",
+      "در پایان نوجوانی",
+      "فقط بعد از بروز آسیب مغزی"
+    ],
+    "answer": 1,
+    "explanation": "تشخیص در همان هفتهٔ اول تولد برای جلوگیری از آسیب جبران‌ناپذیر مورد تأکید است."
+  },
+  {
+    "id": "q31",
+    "type": "mcq",
+    "topic": "نقص آنزیمی",
+    "difficulty": "متوسط",
+    "question": "اگر جهش باعث شود سوبسترا نتواند به جایگاه فعال آنزیم متصل شود، چه نتیجه‌ای محتمل است؟",
+    "options": [
+      "تولید محصول کاهش می‌یابد یا متوقف می‌شود",
+      "تولید محصول همیشه افزایش می‌یابد",
+      "هیچ اثری ندارد",
+      "فقط pH تغییر می‌کند"
+    ],
+    "answer": 0,
+    "explanation": "این رابطه مستقیم در متن توضیح داده شده است."
+  },
+  {
+    "id": "q32",
+    "type": "truefalse",
+    "topic": "نقص آنزیمی",
+    "difficulty": "آسان",
+    "question": "تمام نقص‌های آنزیمی در متن جزوه شدت یکسان دارند.",
+    "answer": false,
+    "explanation": "جزوه شدت نقص را از خفیف تا شدید دسته‌بندی می‌کند."
+  },
+  {
+    "id": "q33",
+    "type": "fillblank",
+    "topic": "کتوژنیک/گلوکوژنیک",
+    "difficulty": "آسان",
+    "question": "دو آمینواسید صرفاً کتوژنیک عبارت‌اند از .......... و ..........",
+    "acceptable": [
+      "لوسین و لایزین",
+      "leucine and lysine",
+      "لوسین، لایزین",
+      "leucine lysine"
+    ],
+    "explanation": "این دو در جزوه تنها آمینواسیدهای صرفاً کتوژنیک‌اند."
+  },
+  {
+    "id": "q34",
+    "type": "fillblank",
+    "topic": "PKU",
+    "difficulty": "آسان",
+    "question": "آنزیم تبدیل فنیل‌آلانین به تیروزین .......... نام دارد.",
+    "acceptable": [
+      "فنیل آلانین هیدروکسیلاز",
+      "فنیل‌آلانین هیدروکسیلاز",
+      "phenylalanine hydroxylase",
+      "PAH"
+    ],
+    "explanation": "این آنزیم مرحلهٔ هیدروکسیلاسیون فنیل‌آلانین را انجام می‌دهد."
+  },
+  {
+    "id": "q35",
+    "type": "fillblank",
+    "topic": "PKU",
+    "difficulty": "متوسط",
+    "question": "کوآنزیم مورد نیاز فنیل‌آلانین هیدروکسیلاز .......... است.",
+    "acceptable": [
+      "تتراهیدروبیوپترین",
+      "tetrahydrobiopterin",
+      "BH4"
+    ],
+    "explanation": "تتراهیدروبیوپترین در متن و اسلاید به‌عنوان کوآنزیم مطرح شده است."
+  },
+  {
+    "id": "q36",
+    "type": "fillblank",
+    "topic": "هیستیدین",
+    "difficulty": "آسان",
+    "question": "حاصل نهایی کاتابولیسم هیستیدین طبق جزوه .......... است.",
+    "acceptable": [
+      "گلوتامیک اسید",
+      "گلوتامات",
+      "glutamate",
+      "glutamic acid"
+    ],
+    "explanation": "متن پایان مسیر را به گلوتامیک اسید / گلوتامات نسبت می‌دهد."
+  },
+  {
+    "id": "q37",
+    "type": "fillblank",
+    "topic": "BCAA",
+    "difficulty": "آسان",
+    "question": "سه آمینواسید شاخه‌دار عبارت‌اند از ..........، .......... و ..........",
+    "acceptable": [
+      "والین لوسین ایزولوسین",
+      "valine leucine isoleucine",
+      "والین، لوسین، ایزولوسین"
+    ],
+    "explanation": "BCAAها در جزوه به این سه آمینواسید اطلاق شده‌اند."
+  },
+  {
+    "id": "q38",
+    "type": "matching",
+    "topic": "PKU",
+    "difficulty": "دشوار",
+    "question": "هر مورد را با جزء مرتبط در مسیر PKU جفت کنید:",
+    "pairs": [
+      {
+        "left": "Type I",
+        "right": "نقص فنیل‌آلانین هیدروکسیلاز"
+      },
+      {
+        "left": "Type II, III",
+        "right": "نقص دی‌هیدروبیوپترین ردوکتاز"
+      },
+      {
+        "left": "Type IV, V",
+        "right": "نقص بیوسنتز دی‌هیدروبیوپترین"
+      }
+    ],
+    "explanation": "این تطبیق مطابق دسته‌بندی درج‌شده در صفحات ۱۲ و ۱۳ جزوه است."
+  },
+  {
+    "id": "q39",
+    "type": "matching",
+    "topic": "بیوسنتز",
+    "difficulty": "متوسط",
+    "question": "هر آنزیم را با واکنش مربوط جفت کنید:",
+    "pairs": [
+      {
+        "left": "گلوتامات دهیدروژناز",
+        "right": "آلفاکتوگلوتارات → گلوتامیک اسید"
+      },
+      {
+        "left": "گلوتامین سنتاز",
+        "right": "گلوتامیک اسید + آمونیاک → گلوتامین"
+      },
+      {
+        "left": "آسپاراژین سنتاز",
+        "right": "آسپارتیک اسید → آسپاراژین"
+      }
+    ],
+    "explanation": "سه واکنش در بخش بیوسنتز آمینواسیدهای غیرضروری آمده‌اند."
+  },
+  {
+    "id": "q40",
+    "type": "matching",
+    "topic": "هیستیدین",
+    "difficulty": "متوسط",
+    "question": "آنزیم‌ها را با مرحلهٔ متناظر در مسیر هیستیدین جفت کنید:",
+    "pairs": [
+      {
+        "left": "هیستیداز",
+        "right": "هیستیدین → اوراکانات"
+      },
+      {
+        "left": "اوراکاناز",
+        "right": "اوراکانات → ایمیدازول پروپیونات"
+      },
+      {
+        "left": "مسیر نهایی",
+        "right": "N-formiminoglutamate → گلوتامات"
+      }
+    ],
+    "explanation": "ترتیب مسیر مطابق متن جزوه تنظیم شده است."
+  },
+  {
+    "id": "q41",
+    "type": "truefalse",
+    "topic": "PKU",
+    "difficulty": "متوسط",
+    "question": "اگر فنیل‌آلانین به تیروزین تبدیل نشود، تیروزین در PKU همچنان برای همهٔ انواع نیازی به اضافه شدن ندارد.",
+    "answer": false,
+    "explanation": "جزوه می‌گوید با اختلال تبدیل، تیروزین باید به رژیم اضافه شود؛ نوع نقص تعیین‌کنندهٔ درمان است."
+  },
+  {
+    "id": "q42",
+    "type": "mcq",
+    "topic": "اختلالات کلیوی",
+    "difficulty": "دشوار",
+    "question": "در متن جزوه، کدام مورد با glycinuria مرتبط شده است؟",
+    "options": [
+      "افزایش تیروزین",
+      "تشکیل سنگ‌های اگزالاتی",
+      "کاهش گلوتامات",
+      "بوی شیرهٔ افرا"
+    ],
+    "answer": 1,
+    "explanation": "دفع گلایسین در جزوه با تشکیل سنگ‌های اگزالاتی پیوند داده شده است."
+  },
+  {
+    "id": "q43",
+    "type": "mcq",
+    "topic": "نقص آنزیمی",
+    "difficulty": "متوسط",
+    "question": "اگر فعالیت یک آنزیم فقط حدود ۲۰٪ کاهش یافته باشد، متن جزوه این وضعیت را چگونه توضیح می‌دهد؟",
+    "options": [
+      "نقص شدید و بدون فعالیت",
+      "ممکن است بیماری خفیف باشد چون حدود ۸۰٪ فعالیت باقی مانده است",
+      "همیشه کشنده است",
+      "اصلاً نقص آنزیمی نیست"
+    ],
+    "answer": 1,
+    "explanation": "مثال صریح جزوه: کاهش ۲۰٪ فعالیت می‌تواند به نقص خفیف منجر شود."
+  },
+  {
+    "id": "q44",
+    "type": "mcq",
+    "topic": "بیوسنتز",
+    "difficulty": "دشوار",
+    "question": "کدام گزینه در جزوه به شباهت ساختاری سرین و سیستئین اشاره می‌کند؟",
+    "options": [
+      "هر دو OH دارند",
+      "سرین OH و سیستئین SH دارد",
+      "هر دو SH دارند",
+      "سرین NH2 و سیستئین COOH دارد"
+    ],
+    "answer": 1,
+    "explanation": "جزوه صراحتاً سرین را دارای OH و سیستئین را دارای SH معرفی می‌کند."
+  },
+  {
+    "id": "q45",
+    "type": "mcq",
+    "topic": "PKU",
+    "difficulty": "دشوار",
+    "question": "اگر مشکل از دی‌هیدروبیوپترین و تتراهیدروبیوپترین باشد و فنیل‌آلانین هیدروکسیلاز عملکرد صحیحی داشته باشد، طبق جزوه چه رویکردی مطرح است؟",
+    "options": [
+      "حذف کامل تیروزین",
+      "افزودن بیوپترین‌ها به‌صورت مکمل",
+      "فقط افزایش پروتئین",
+      "قطع تمام آمینواسیدها"
+    ],
+    "answer": 1,
+    "explanation": "در چنین حالتی جزوه اضافه کردن دی‌هیدروبیوپترین / تتراهیدروبیوپترین به‌عنوان مکمل را مطرح می‌کند."
+  }
+];
+
+    // --- State Management ---
+    let appState = {
+      theme: "light",
+      fontSize: "medium",
+      fcKnown: {}, // { fc_1: true, ... }
+      bookmarks: {}, // { q_id: true }
+      quizHistory: [], // [{ id, correct: bool, topic, diff, userAns, correctAns }]
+      currentQuiz: null
+    };
+
+    function loadState() {
+      const saved = Storage.getItem("urea_app_state");
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          appState = Object.assign(appState, parsed);
+        } catch (e) {}
+      }
+      applyThemeAndFont();
+    }
+
+    function saveState() {
+      Storage.setItem("urea_app_state", JSON.stringify(appState));
+    }
+
+    function applyThemeAndFont() {
+      document.documentElement.setAttribute("data-theme", appState.theme || "light");
+      document.documentElement.setAttribute("data-font-size", appState.fontSize || "medium");
+      const themeSelect = document.getElementById("themeSelect");
+      const fontSelect = document.getElementById("fontSizeSelect");
+      if (themeSelect) themeSelect.value = appState.theme || "light";
+      if (fontSelect) fontSelect.value = appState.fontSize || "medium";
+    }
+
+    // --- Tab Navigation Router ---
+    function initNavigation() {
+      const navBtns = document.querySelectorAll(".nav-btn");
+      navBtns.forEach(btn => {
+        btn.addEventListener("click", () => {
+          const tab = btn.getAttribute("data-tab");
+          switchTab(tab);
+        });
+      });
+
+      window.addEventListener("hashchange", () => {
+        const hash = window.location.hash.replace("#", "");
+        if (hash) switchTab(hash, false);
+      });
+
+      if (window.location.hash) {
+        switchTab(window.location.hash.replace("#", ""), false);
+      }
+    }
+
+    function switchTab(tabId, updateHash = true) {
+      const targetSec = document.getElementById("tab-" + tabId);
+      if (!targetSec) return;
+
+      document.querySelectorAll(".tab-content").forEach(el => el.classList.remove("active"));
+      document.querySelectorAll(".nav-btn").forEach(el => el.classList.remove("active"));
+
+      targetSec.classList.add("active");
+      const btn = document.querySelector(`.nav-btn[data-tab="${tabId}"]`);
+      if (btn) btn.classList.add("active");
+
+      if (updateHash) {
+        window.location.hash = tabId;
+      }
+
+      if (tabId === "analytics") {
+        renderAnalytics();
+      }
+    }
+
+    // --- Tab 1: TOC Auto-generator ---
+    function initTOC() {
+      const lectureArticle = document.getElementById("lectureArticle");
+      const tocList = document.getElementById("tocList");
+      if (!lectureArticle || !tocList) return;
+
+      const headings = lectureArticle.querySelectorAll("h2, h3");
+      tocList.innerHTML = "";
+      headings.forEach((heading, idx) => {
+        if (!heading.id) {
+          heading.id = "heading-" + idx;
+        }
+        const li = document.createElement("li");
+        const a = document.createElement("a");
+        a.href = "#" + heading.id;
+        a.textContent = heading.textContent;
+        if (heading.tagName.toLowerCase() === "h3") {
+          a.classList.add("h3-link");
+        }
+        a.addEventListener("click", (e) => {
+          e.preventDefault();
+          heading.scrollIntoView({ behavior: "smooth" });
+        });
+        li.appendChild(a);
+        tocList.appendChild(li);
+      });
+    }
+
+    // --- Tab 2: Flashcards Logic ---
+    let fcFilteredList = [];
+    let fcIndex = 0;
+
+    function initFlashcards() {
+      const filterSelect = document.getElementById("fcTopicFilter");
+      const scene = document.getElementById("fcScene");
+      const cardEl = document.getElementById("flashcardElement");
+      const prevBtn = document.getElementById("fcPrevBtn");
+      const nextBtn = document.getElementById("fcNextBtn");
+      const knownBtn = document.getElementById("fcKnownBtn");
+      const unknownBtn = document.getElementById("fcUnknownBtn");
+
+      filterSelect.addEventListener("change", () => {
+        applyFcFilter();
+      });
+
+      scene.addEventListener("click", () => {
+        cardEl.classList.toggle("is-flipped");
+      });
+
+      prevBtn.addEventListener("click", () => {
+        if (fcIndex > 0) {
+          fcIndex--;
+          renderFlashcard();
+        }
+      });
+
+      nextBtn.addEventListener("click", () => {
+        if (fcIndex < fcFilteredList.length - 1) {
+          fcIndex++;
+          renderFlashcard();
+        }
+      });
+
+      knownBtn.addEventListener("click", () => {
+        if (fcFilteredList[fcIndex]) {
+          appState.fcKnown[fcFilteredList[fcIndex].id] = true;
+          saveState();
+          updateFcProgress();
+          if (fcIndex < fcFilteredList.length - 1) {
+            fcIndex++;
+            renderFlashcard();
+          }
+        }
+      });
+
+      unknownBtn.addEventListener("click", () => {
+        if (fcFilteredList[fcIndex]) {
+          delete appState.fcKnown[fcFilteredList[fcIndex].id];
+          saveState();
+          updateFcProgress();
+          if (fcIndex < fcFilteredList.length - 1) {
+            fcIndex++;
+            renderFlashcard();
+          }
+        }
+      });
+
+      applyFcFilter();
+    }
+
+    function applyFcFilter() {
+      const filterVal = document.getElementById("fcTopicFilter").value;
+      if (filterVal === "all") {
+        fcFilteredList = flashcardsData.slice();
+      } else {
+        fcFilteredList = flashcardsData.filter(item => item.topic === filterVal);
+      }
+      fcIndex = 0;
+      renderFlashcard();
+      updateFcProgress();
+    }
+
+    function renderFlashcard() {
+      const cardEl = document.getElementById("flashcardElement");
+      cardEl.classList.remove("is-flipped");
+
+      if (fcFilteredList.length === 0) {
+        document.getElementById("fcFrontText").textContent = "کارت موجود نیست.";
+        document.getElementById("fcBackText").textContent = "";
+        document.getElementById("fcTopicLabel").textContent = "";
+        return;
+      }
+
+      const item = fcFilteredList[fcIndex];
+      document.getElementById("fcTopicLabel").textContent = "مبحث: " + item.topic;
+      document.getElementById("fcFrontText").textContent = item.front;
+      document.getElementById("fcBackText").textContent = item.back;
+    }
+
+    function updateFcProgress() {
+      const total = fcFilteredList.length;
+      let knownCount = 0;
+      fcFilteredList.forEach(item => {
+        if (appState.fcKnown[item.id]) knownCount++;
+      });
+      document.getElementById("fcProgressText").textContent = `${knownCount} از ${total} بلد بودم`;
+    }
+
+    // --- Tab 3: Text Normalizer & Quiz Logic ---
+    function normalizeText(str) {
+      if (!str) return "";
+      let s = String(str);
+      // Arabic/Persian digits to Latin
+      const pDigits = ["۰","۱","۲","۳","۴","۵","۶","۷","۸","۹"];
+      const aDigits = ["٠","١","٢","٣","٤","٥","٦","٧","٨","٩"];
+      for (let i = 0; i < 10; i++) {
+        s = s.replace(new RegExp(pDigits[i], "g"), String(i));
+        s = s.replace(new RegExp(aDigits[i], "g"), String(i));
+      }
+      // Remove Diacritics
+      s = s.replace(/[ً-ٰٟ]/g, "");
+      // Unify Arabic Yeh/Kaf to Persian
+      s = s.replace(/ي/g, "ی"); // ي -> ی
+      s = s.replace(/ى/g, "ی"); // ى -> ی
+      s = s.replace(/ك/g, "ک"); // ك -> ک
+      // ZWNJ to space, and normalize multiple whitespace
+      s = s.replace(/‌/g, " ");
+      s = s.replace(/\s+/g, " ");
+      return s.trim().toLowerCase();
+    }
+
+    let activeQuizQuestions = [];
+    let currentQuizIndex = 0;
+    let quizUserAnswers = {}; // { q_idx: { isCorrect, userAns, details } }
+
+    function initQuizModule() {
+      const btnStart = document.getElementById("btnStartQuiz");
+      const btnNext = document.getElementById("btnQuizNext");
+      const btnPrev = document.getElementById("btnQuizPrev");
+      const btnRestart = document.getElementById("btnRestartQuiz");
+      const btnBookmark = document.getElementById("btnBookmarkQuiz");
+
+      btnStart.addEventListener("click", startNewQuiz);
+      btnNext.addEventListener("click", () => {
+        if (currentQuizIndex < activeQuizQuestions.length - 1) {
+          currentQuizIndex++;
+          renderQuizQuestion();
+        } else {
+          finishQuiz();
+        }
+      });
+
+      btnPrev.addEventListener("click", () => {
+        if (currentQuizIndex > 0) {
+          currentQuizIndex--;
+          renderQuizQuestion();
+        }
+      });
+
+      btnRestart.addEventListener("click", () => {
+        document.getElementById("quizResultPanel").style.display = "none";
+        document.getElementById("quizSetupPanel").style.display = "block";
+      });
+
+      btnBookmark.addEventListener("click", () => {
+        const q = activeQuizQuestions[currentQuizIndex];
+        if (!q) return;
+        if (appState.bookmarks[q.id]) {
+          delete appState.bookmarks[q.id];
+        } else {
+          appState.bookmarks[q.id] = true;
+        }
+        saveState();
+        updateBookmarkButton();
+      });
+    }
+
+    function startNewQuiz() {
+      const topic = document.getElementById("quizTopic").value;
+      const diff = document.getElementById("quizDiff").value;
+      const count = parseInt(document.getElementById("quizCount").value, 10) || 5;
+
+      let pool = questionsData.filter(q => {
+        if (topic !== "all" && q.topic !== topic) return false;
+        if (diff !== "all" && q.difficulty !== diff) return false;
+        return true;
+      });
+
+      if (pool.length === 0) {
+        alert("سؤالی با این فیلترها یافت نشد!");
+        return;
+      }
+
+      // Shuffle
+      pool = pool.sort(() => Math.random() - 0.5);
+      activeQuizQuestions = pool.slice(0, count);
+      currentQuizIndex = 0;
+      quizUserAnswers = {};
+
+      document.getElementById("quizSetupPanel").style.display = "none";
+      document.getElementById("quizResultPanel").style.display = "none";
+      document.getElementById("quizActiveArea").style.display = "block";
+
+      renderQuizQuestion();
+    }
+
+    function updateBookmarkButton() {
+      const q = activeQuizQuestions[currentQuizIndex];
+      const lbl = document.getElementById("bookmarkLabel");
+      if (appState.bookmarks[q.id]) {
+        lbl.textContent = "نشان‌شده ⭐";
+      } else {
+        lbl.textContent = "نشان کردن";
+      }
+    }
+
+    function renderQuizQuestion() {
+      const q = activeQuizQuestions[currentQuizIndex];
+      document.getElementById("quizQuestionTracker").textContent = `سؤال ${currentQuizIndex + 1} از ${activeQuizQuestions.length}`;
+      document.getElementById("quizBadgeTopic").textContent = q.topic;
+      document.getElementById("quizBadgeDiff").textContent = q.difficulty;
+      document.getElementById("quizQuestionPrompt").textContent = q.question;
+
+      updateBookmarkButton();
+
+      const container = document.getElementById("quizInteractiveContainer");
+      container.innerHTML = "";
+
+      const expBox = document.getElementById("quizExplanationBox");
+      expBox.style.display = "none";
+      expBox.textContent = "";
+
+      const existingAns = quizUserAnswers[currentQuizIndex];
+
+      if (q.type === "mcq") {
+        renderMCQ(container, q, existingAns);
+      } else if (q.type === "truefalse") {
+        renderTrueFalse(container, q, existingAns);
+      } else if (q.type === "fillblank") {
+        renderFillBlank(container, q, existingAns);
+      } else if (q.type === "matching") {
+        renderMatching(container, q, existingAns);
+      }
+
+      if (existingAns) {
+        showExplanation(q.explanation);
+      }
+
+      // Update button text
+      const nextBtn = document.getElementById("btnQuizNext");
+      if (currentQuizIndex === activeQuizQuestions.length - 1) {
+        nextBtn.textContent = "مشاهده کارنامه";
+      } else {
+        nextBtn.textContent = "سؤال بعدی";
+      }
+    }
+
+    function showExplanation(text) {
+      const expBox = document.getElementById("quizExplanationBox");
+      expBox.innerHTML = `<strong>پاسخ تشریحی:</strong> ${text}`;
+      expBox.style.display = "block";
+    }
+
+    function recordQuizAnswer(isCorrect, userAnsText, correctAnsText) {
+      const q = activeQuizQuestions[currentQuizIndex];
+      quizUserAnswers[currentQuizIndex] = {
+        isCorrect: isCorrect,
+        userAns: userAnsText,
+        correctAns: correctAnsText
+      };
+      appState.quizHistory.push({
+        id: q.id,
+        topic: q.topic,
+        difficulty: q.difficulty,
+        correct: isCorrect,
+        question: q.question,
+        userAns: userAnsText,
+        correctAns: correctAnsText
+      });
+      saveState();
+      showExplanation(q.explanation);
+    }
+
+    const persLetters = ["الف", "ب", "ج", "د"];
+
+    function renderMCQ(container, q, existingAns) {
+      const grid = document.createElement("div");
+      grid.className = "quiz-options-grid";
+
+      q.options.forEach((opt, idx) => {
+        const btn = document.createElement("button");
+        btn.className = "option-btn";
+        btn.innerHTML = `<span style="font-weight: bold; min-width: 25px;">${persLetters[idx]})</span> <span>${opt}</span>`;
+
+        if (existingAns) {
+          btn.disabled = true;
+          if (idx === q.answer) btn.classList.add("correct");
+          if (existingAns.userAnsIndex === idx && !existingAns.isCorrect) {
+            btn.classList.add("incorrect");
+          }
+        } else {
+          btn.addEventListener("click", () => {
+            const isCorrect = (idx === q.answer);
+            quizUserAnswers[currentQuizIndex] = {
+              isCorrect: isCorrect,
+              userAnsIndex: idx,
+              userAns: opt,
+              correctAns: q.options[q.answer]
+            };
+            recordQuizAnswer(isCorrect, opt, q.options[q.answer]);
+            renderQuizQuestion();
+          });
+        }
+        grid.appendChild(btn);
+      });
+      container.appendChild(grid);
+    }
+
+    function renderTrueFalse(container, q, existingAns) {
+      const grid = document.createElement("div");
+      grid.className = "quiz-options-grid";
+      grid.style.gridTemplateColumns = "1fr 1fr";
+
+      const choices = [
+        { label: "درست (صحیح)", val: true },
+        { label: "نادرست (غلط)", val: false }
+      ];
+
+      choices.forEach(ch => {
+        const btn = document.createElement("button");
+        btn.className = "option-btn";
+        btn.style.justifyContent = "center";
+        btn.textContent = ch.label;
+
+        if (existingAns) {
+          btn.disabled = true;
+          if (ch.val === q.answer) btn.classList.add("correct");
+          if (existingAns.userChoice === ch.val && !existingAns.isCorrect) {
+            btn.classList.add("incorrect");
+          }
+        } else {
+          btn.addEventListener("click", () => {
+            const isCorrect = (ch.val === q.answer);
+            quizUserAnswers[currentQuizIndex] = {
+              isCorrect: isCorrect,
+              userChoice: ch.val,
+              userAns: ch.label,
+              correctAns: q.answer ? "درست" : "نادرست"
+            };
+            recordQuizAnswer(isCorrect, ch.label, q.answer ? "درست" : "نادرست");
+            renderQuizQuestion();
+          });
+        }
+        grid.appendChild(btn);
+      });
+      container.appendChild(grid);
+    }
+
+    function renderFillBlank(container, q, existingAns) {
+      const wrapper = document.createElement("div");
+      wrapper.style.margin = "1rem 0";
+
+      const input = document.createElement("input");
+      input.type = "text";
+      input.placeholder = "پاسخ خود را وارد کنید...";
+      input.style.marginBottom = "0.75rem";
+
+      const btnSubmit = document.createElement("button");
+      btnSubmit.className = "btn";
+      btnSubmit.textContent = "ثبت پاسخ";
+
+      if (existingAns) {
+        input.value = existingAns.userAns;
+        input.disabled = true;
+        btnSubmit.disabled = true;
+        const note = document.createElement("div");
+        note.style.marginTop = "0.5rem";
+        note.style.fontWeight = "bold";
+        note.style.color = existingAns.isCorrect ? "var(--success)" : "var(--error)";
+        note.textContent = existingAns.isCorrect ? "✔️ پاسخ شما صحیح بود." : `❌ پاسخ شما نادرست بود (پاسخ نمونه: ${q.acceptable[0]})`;
+        wrapper.appendChild(input);
+        wrapper.appendChild(note);
+      } else {
+        btnSubmit.addEventListener("click", () => {
+          const val = input.value.trim();
+          if (!val) return;
+          const normVal = normalizeText(val);
+          const isCorrect = q.acceptable.some(acc => normalizeText(acc) === normVal);
+          recordQuizAnswer(isCorrect, val, q.acceptable[0]);
+          renderQuizQuestion();
+        });
+        wrapper.appendChild(input);
+        wrapper.appendChild(btnSubmit);
+      }
+      container.appendChild(wrapper);
+    }
+
+    function renderMatching(container, q, existingAns) {
+      const matchingBox = document.createElement("div");
+      matchingBox.className = "matching-container";
+
+      if (existingAns) {
+        matchingBox.innerHTML = "<div style='grid-column: span 2; padding: 1rem; text-align: center; color: var(--text-muted);'>پاسخ‌های این بخش ثبت شده است.</div>";
+        container.appendChild(matchingBox);
+        return;
+      }
+
+      // Stateful matching within session
+      const leftItems = q.pairs.map(p => p.left);
+      const rightItems = q.pairs.map(p => p.right).sort(() => Math.random() - 0.5);
+
+      let selectedLeft = null;
+      let matchedPairs = {};
+
+      const leftCol = document.createElement("div");
+      leftCol.style.display = "flex";
+      leftCol.style.flexDirection = "column";
+      leftCol.style.gap = "0.5rem";
+
+      const rightCol = document.createElement("div");
+      rightCol.style.display = "flex";
+      rightCol.style.flexDirection = "column";
+      rightCol.style.gap = "0.5rem";
+
+      leftItems.forEach(item => {
+        const div = document.createElement("div");
+        div.className = "matching-item";
+        div.textContent = item;
+        div.addEventListener("click", () => {
+          if (div.classList.contains("matched")) return;
+          leftCol.querySelectorAll(".matching-item").forEach(el => el.classList.remove("selected"));
+          div.classList.add("selected");
+          selectedLeft = item;
+        });
+        leftCol.appendChild(div);
+      });
+
+      rightItems.forEach(item => {
+        const div = document.createElement("div");
+        div.className = "matching-item";
+        div.textContent = item;
+        div.addEventListener("click", () => {
+          if (!selectedLeft || div.classList.contains("matched")) return;
+          matchedPairs[selectedLeft] = item;
+
+          // Check pairs
+          const pairDef = q.pairs.find(p => p.left === selectedLeft);
+          const isMatch = (pairDef && pairDef.right === item);
+
+          div.classList.add("matched");
+          const lEl = Array.from(leftCol.children).find(el => el.textContent === selectedLeft);
+          if (lEl) lEl.classList.add("matched");
+          selectedLeft = null;
+
+          if (Object.keys(matchedPairs).length === q.pairs.length) {
+            // Evaluated
+            let allCorrect = true;
+            q.pairs.forEach(p => {
+              if (matchedPairs[p.left] !== p.right) allCorrect = false;
+            });
+            recordQuizAnswer(allCorrect, "تطابق کامل شده", "تطابق صحیح جفت‌ها");
+            renderQuizQuestion();
+          }
+        });
+        rightCol.appendChild(div);
+      });
+
+      matchingBox.appendChild(leftCol);
+      matchingBox.appendChild(rightCol);
+      container.appendChild(matchingBox);
+    }
+
+    function finishQuiz() {
+      document.getElementById("quizActiveArea").style.display = "none";
+      const resultPanel = document.getElementById("quizResultPanel");
+      resultPanel.style.display = "block";
+
+      let correctCount = 0;
+      const mistakes = [];
+
+      activeQuizQuestions.forEach((q, idx) => {
+        const ans = quizUserAnswers[idx];
+        if (ans && ans.isCorrect) {
+          correctCount++;
+        } else {
+          mistakes.push({
+            q: q.question,
+            userAns: ans ? ans.userAns : "بدون پاسخ",
+            correctAns: ans ? ans.correctAns : q.explanation
+          });
+        }
+      });
+
+      const pct = Math.round((correctCount / activeQuizQuestions.length) * 100) || 0;
+      document.getElementById("quizFinalScore").textContent = pct + "%";
+
+      const mistakesListEl = document.getElementById("quizMistakesList");
+      if (mistakes.length === 0) {
+        mistakesListEl.innerHTML = "<p style='color: var(--success);'>عالی! هیچ پاسخ غلطی نداشتید.</p>";
+      } else {
+        let html = "<ul style='padding-right: 1.25rem;'>";
+        mistakes.forEach(m => {
+          html += `<li style='margin-bottom: 0.75rem;'>
+            <strong>سؤال:</strong> ${m.q}<br>
+            <span style='color: var(--error);'>پاسخ شما: ${m.userAns}</span> | 
+            <span style='color: var(--success);'>پاسخ صحیح: ${m.correctAns}</span>
+          </li>`;
+        });
+        html += "</ul>";
+        mistakesListEl.innerHTML = html;
+      }
+    }
+
+    // --- Tab 4: Analytics Logic ---
+    function renderAnalytics() {
+      const history = appState.quizHistory || [];
+      const total = history.length;
+      const correct = history.filter(h => h.correct).length;
+      const accuracy = total > 0 ? Math.round((correct / total) * 100) : 0;
+
+      document.getElementById("statTotalAnswered").textContent = total;
+      document.getElementById("statOverallAccuracy").textContent = accuracy + "%";
+
+      // By Topic
+      const topicStats = {};
+      const diffStats = {};
+
+      history.forEach(h => {
+        if (!topicStats[h.topic]) topicStats[h.topic] = { total: 0, correct: 0 };
+        topicStats[h.topic].total++;
+        if (h.correct) topicStats[h.topic].correct++;
+
+        if (!diffStats[h.difficulty]) diffStats[h.difficulty] = { total: 0, correct: 0 };
+        diffStats[h.difficulty].total++;
+        if (h.correct) diffStats[h.difficulty].correct++;
+      });
+
+      renderBarChart("topicChartContainer", topicStats);
+      renderBarChart("diffChartContainer", diffStats);
+
+      // Mistakes Table
+      const mistakesBody = document.getElementById("mistakesTableBody");
+      const mistakes = history.filter(h => !h.correct).slice(-10).reverse();
+      if (mistakes.length === 0) {
+        mistakesBody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:var(--text-muted);">هیچ سابقه خطایی ثبت نشده است.</td></tr>';
+      } else {
+        mistakesBody.innerHTML = mistakes.map(m => `
+          <tr>
+            <td>${m.question}</td>
+            <td style="color: var(--error);">${m.userAns || "-"}</td>
+            <td style="color: var(--success);">${m.correctAns || "-"}</td>
+          </tr>
+        `).join("");
+      }
+    }
+
+    function renderBarChart(containerId, statsObj) {
+      const container = document.getElementById(containerId);
+      container.innerHTML = "";
+      const keys = Object.keys(statsObj);
+      if (keys.length === 0) {
+        container.innerHTML = "<div style='color: var(--text-muted); font-size: 0.85rem;'>داده‌ای برای نمایش وجود ندارد.</div>";
+        return;
+      }
+      keys.forEach(key => {
+        const item = statsObj[key];
+        const pct = item.total > 0 ? Math.round((item.correct / item.total) * 100) : 0;
+        const row = document.createElement("div");
+        row.className = "chart-row";
+        row.innerHTML = `
+          <span style="font-size: 0.85rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${key}</span>
+          <div class="bar-track">
+            <div class="bar-fill" style="width: ${pct}%;"></div>
+          </div>
+          <span style="font-size: 0.85rem; text-align: left; font-weight: bold;">${pct}%</span>
+        `;
+        container.appendChild(row);
+      });
+    }
+
+    // --- Settings & Backup/Restore ---
+    function initSettingsModal() {
+      const modal = document.getElementById("settingsModal");
+      const btnOpen = document.getElementById("btnSettingsModal");
+      const btnClose = document.getElementById("btnCloseSettingsModal");
+      const btnSave = document.getElementById("btnSaveSettings");
+      const themeSelect = document.getElementById("themeSelect");
+      const fontSelect = document.getElementById("fontSizeSelect");
+      const btnExport = document.getElementById("btnExportJSON");
+      const importInput = document.getElementById("importFileInput");
+      const btnReset = document.getElementById("btnResetAnalytics");
+
+      btnOpen.addEventListener("click", () => modal.classList.add("open"));
+      btnClose.addEventListener("click", () => modal.classList.remove("open"));
+      btnSave.addEventListener("click", () => {
+        appState.theme = themeSelect.value;
+        appState.fontSize = fontSelect.value;
+        saveState();
+        applyThemeAndFont();
+        modal.classList.remove("open");
+      });
+
+      themeSelect.addEventListener("change", () => {
+        appState.theme = themeSelect.value;
+        applyThemeAndFont();
+      });
+
+      fontSelect.addEventListener("change", () => {
+        appState.fontSize = fontSelect.value;
+        applyThemeAndFont();
+      });
+
+      // Export JSON
+      btnExport.addEventListener("click", () => {
+        const dataStr = JSON.stringify(appState, null, 2);
+        const blob = new Blob([dataStr], { type: "application/json;charset=utf-8;" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `urea_study_backup_${new Date().toISOString().slice(0,10)}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      });
+
+      // Import JSON
+      importInput.addEventListener("change", (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          try {
+            const imported = JSON.parse(event.target.result);
+            if (typeof imported === "object" && imported !== null) {
+              appState = Object.assign(appState, imported);
+              saveState();
+              applyThemeAndFont();
+              renderAnalytics();
+              updateFcProgress();
+              alert("پشتیبان با موفقیت بازیابی شد!");
+              modal.classList.remove("open");
+            }
+          } catch (err) {
+            alert("خطا در خواندن فایل JSON پشتیبان.");
+          }
+        };
+        reader.readAsText(file);
+      });
+
+      // Reset Analytics
+      btnReset.addEventListener("click", () => {
+        if (confirm("آیا از بازنشانی کامل سوابق آزمون و پیشرفت فلش‌کارت‌ها اطمینان دارید؟")) {
+          appState.fcKnown = {};
+          appState.bookmarks = {};
+          appState.quizHistory = [];
+          saveState();
+          renderAnalytics();
+          updateFcProgress();
+          alert("تمام پیشرفت‌ها با موفقیت پاک شدند.");
+        }
+      });
+    }
+
+    // --- Initialization ---
+    document.addEventListener("DOMContentLoaded", () => {
+      loadState();
+      initNavigation();
+      initTOC();
+      initFlashcards();
+      initQuizModule();
+      initSettingsModal();
+    });
+  </script>
+  <script>
+    (() => {
+      const progress = document.getElementById('scrollProgressBar');
+      const updateProgress = () => {
+        const root = document.documentElement;
+        const max = Math.max(1, root.scrollHeight - root.clientHeight);
+        if (progress) progress.style.width = `${Math.min(100, (root.scrollTop / max) * 100)}%`;
+      };
+      window.addEventListener('scroll', updateProgress, { passive: true });
+      window.addEventListener('resize', updateProgress);
+      updateProgress();
+
+      const syncToc = () => {
+        const article = document.getElementById('lectureArticle');
+        const toc = document.getElementById('tocList');
+        if (!article || !toc || !('IntersectionObserver' in window)) return;
+        const headings = [...article.querySelectorAll('h2[id], h3[id]')];
+        const links = new Map([...toc.querySelectorAll('a')].map(a => [a.getAttribute('href')?.slice(1), a]));
+        const obs = new IntersectionObserver(entries => {
+          const visible = entries.filter(e => e.isIntersecting).sort((a,b) => a.boundingClientRect.top - b.boundingClientRect.top)[0];
+          if (!visible) return;
+          links.forEach(a => a.classList.remove('is-current'));
+          const active = links.get(visible.target.id);
+          if (active) {
+            active.classList.add('is-current');
+            active.scrollIntoView({ block: 'nearest' });
+          }
+        }, { rootMargin: '-16% 0px -72% 0px', threshold: 0 });
+        headings.forEach(h => obs.observe(h));
+      };
+
+      window.addEventListener('DOMContentLoaded', () => setTimeout(syncToc, 0));
+    })();
+  </script>
+
+</body>
+</html>

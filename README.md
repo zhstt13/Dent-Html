@@ -1,46 +1,41 @@
 # Dent-Html
 
-Interactive dental/biochemistry learning interface with a production-ready standalone study page and a modular migration scaffold.
+Maintainable dental-learning repository with a modular runtime plus complete standalone study pages.
 
-## Production Entry Point
-- `index.html` = full standalone **Protein Metabolism · Session 05** experience
-- Includes lecture content, flashcards, topic quiz, analytics, settings, local progress storage, and responsive UI
-- The embedded branded hero image is web-optimized to keep the standalone page substantially lighter
+## Entry Points
+- `index.html` = existing modular production/static-server entry point
+- `metabolism-protein-session5.html` = full interactive Session 5 study page, imported from the supplied HTML and redesigned
+- `src/app/index.html` = modular development entry point
 
-## Modular Architecture
-- `src/components/` = component markup and component CSS
+## Session 5 Import
+The complete **Metabolism of Proteins — Session 5** source is now present in the repository as a standalone page.
+
+Design/runtime changes:
+- externalized the large embedded GUMS hero image to `assets/gums-header.png`
+- premium responsive dental/biochemistry visual system
+- upgraded sticky navigation, hero treatment, cards, callouts, flashcards, quiz and analytics surfaces
+- added page-reading progress and active table-of-contents highlighting
+- preserved the original study content, quiz logic, flashcards, settings and local progress state
+- preserved a stable designed checkpoint in `versions/metabolism-protein-session5-premium-v1.html`
+
+## Architecture
+- `src/components/` = modular component markup and component CSS
 - `src/scripts/` = application/runtime controllers
 - `src/styles/` = global tokens, base, responsive and motion layers
-- `content/` = structured-content experiments and schemas
-- `docs/` = architecture and migration status
+- `assets/` = shared media assets
+- `docs/` = architecture, migration and import notes
 - `tests/` = dependency-free static smoke checks
 - `versions/` = stable checkpoints
 
+## Run
+Serve the repository through an HTTP static server. Open `index.html` for the modular runtime or `metabolism-protein-session5.html` for the complete Session 5 page.
+
 ## Current Migration State
-The original full Session 05 HTML source has now been imported into the repository and is the production `index.html`.
-
-The `src/` modular runtime remains as a separate migration scaffold for future decomposition. It should not be treated as the current production source until the full standalone page has been migrated component-by-component without feature loss.
-
-## Design Layer
-The production page now has a premium study UI with:
-- branded session masthead
-- glass/sticky navigation
-- stronger visual hierarchy for lecture sections
-- upgraded callouts, fact cards, diagrams, tables and memory hooks
-- redesigned flashcards, quiz states, analytics and modal surfaces
-- light/dark/sepia theme compatibility
-- mobile-specific layout refinements
-- reduced-motion support
-
-## Source Preservation
-Git history preserves the pre-redesign full import:
-- Full source import: `2836c38949e77130e29f7c77dd1671b070267b3f`
-- Premium redesign: `f3dd4a42d2e556fc11ed23d9154e18d00a7c48c7`
+The original Session 5 source is no longer missing: it is imported as a complete standalone page. The modular runtime under `src/` remains intact and can continue migrating the standalone page component-by-component without reconstructing source content.
 
 ## Development Rules
-Every major component should keep:
+Every major component must have:
 - clear ownership
 - documentation
 - debug notes
 - change tracking
-- no silent feature removal during modular migration
