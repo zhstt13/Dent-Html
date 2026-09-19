@@ -10,6 +10,20 @@
         card.addEventListener('click', () => {
           const flipped = card.classList.toggle('is-flipped');
           card.setAttribute('aria-pressed', flipped ? 'true' : 'false');
+
+          if (window.DentState) {
+            const id = card.dataset.flashcard || card.id || crypto.randomUUID();
+            const state = DentState.get();
+            DentState.update({
+              flashcards: {
+                ...state.flashcards,
+                [id]: {
+                  flipped,
+                  viewedAt: new Date().toISOString()
+                }
+              }
+            });
+          }
         });
       });
     }
