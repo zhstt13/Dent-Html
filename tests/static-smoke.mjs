@@ -12,21 +12,26 @@ function assert(condition, message) {
 
 const components = ['header', 'hero', 'navigation', 'lecture', 'flashcard', 'quiz', 'result', 'modal'];
 
-assert(exists('index.html'), 'Missing root index.html');
+assert(exists('index.html'), 'Missing production index.html');
+assert(exists('src/index.html'), 'Missing modular src/index.html');
 assert(exists('src/scripts/app.js'), 'Missing runtime src/scripts/app.js');
 
-const index = read('index.html');
+const production = read('index.html');
+const modularIndex = read('src/index.html');
 const app = read('src/scripts/app.js');
+
+assert(production.includes('id="lectureArticle"'), 'Production page is missing lecture content');
+assert(production.includes('id="tab-quiz"'), 'Production page is missing quiz tab');
 
 for (const component of components) {
   assert(exists(`src/components/${component}/component.html`), `Missing component markup: ${component}`);
   assert(exists(`src/components/${component}/component.css`), `Missing component stylesheet: ${component}`);
   assert(app.includes(`'${component}'`), `Runtime does not register component: ${component}`);
-  assert(index.includes(`data-component="${component}"`), `Root entry does not mount component: ${component}`);
+  assert(modularIndex.includes(`data-component="${component}"`), `Modular entry does not mount component: ${component}`);
 }
 
 for (const script of ['theme.js', 'navigation.js', 'flashcard.js', 'quiz.js', 'result.js', 'app.js']) {
-  assert(index.includes(`src/scripts/${script}`), `Root entry is missing script: ${script}`);
+  assert(modularIndex.includes(`scripts/${script}`), `Modular entry is missing script: ${script}`);
 }
 
 assert(exists('src/scripts/progress.js'), 'Missing progress controller');
@@ -39,4 +44,4 @@ if (failures.length) {
   process.exit(1);
 }
 
-console.log(`Dent-Html static smoke test passed (${components.length} components checked).`);
+console.log(`Dent-Html static smoke test passed (${components.length} modular components + production page checked).`);
