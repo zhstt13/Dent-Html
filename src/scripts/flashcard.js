@@ -2,18 +2,20 @@
 (() => {
   window.DentFlashcard = {
     init() {
-      const system = document.getElementById('flashcard-system');
-      if (!system || system.dataset.controllerReady === 'true') return;
+      document.querySelectorAll('[data-flashcard]').forEach((card) => {
+        if (card.dataset.controllerReady === 'true') return;
 
-      const card = system.querySelector('[data-flashcard]');
-      if (!card) return;
+        card.dataset.controllerReady = 'true';
 
-      system.dataset.controllerReady = 'true';
-
-      card.addEventListener('click', () => {
-        const flipped = card.classList.toggle('is-flipped');
-        card.setAttribute('aria-pressed', flipped ? 'true' : 'false');
+        card.addEventListener('click', () => {
+          const flipped = card.classList.toggle('is-flipped');
+          card.setAttribute('aria-pressed', flipped ? 'true' : 'false');
+        });
       });
     }
   };
+
+  window.addEventListener('dent-components-ready', () => {
+    window.DentFlashcard.init();
+  });
 })();
