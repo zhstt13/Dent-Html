@@ -26,6 +26,11 @@
           }
         });
       });
+    },
+
+    loadContent(path = 'content/example-content.json') {
+      if (!window.DentContent) return Promise.resolve(null);
+      return DentContent.load(path);
     }
   };
 
