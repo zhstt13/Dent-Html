@@ -3,6 +3,21 @@
     "id": "lesson-001",
     "title": "Sample Lesson"
   },
-  "flashcards": [],
-  "quizzes": []
+  "flashcards": [
+    {
+      "id": "card-001",
+      "front": "Enamel چیست؟",
+      "back": "سخت‌ترین بخش دندان است.",
+      "difficulty": "easy"
+    }
+  ],
+  "quizzes": [
+    {
+      "id": "quiz-001",
+      "question": "سخت‌ترین بخش دندان کدام است؟",
+      "options": ["Enamel", "Dentin"],
+      "answer": "Enamel",
+      "explanation": "Enamel لایه خارجی و سخت دندان است."
+    }
+  ]
 }
