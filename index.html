@@ -3,35 +3,3265 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Dent HTML modular dental learning interface">
-  <meta name="color-scheme" content="light dark">
-  <title>Dent HTML</title>
-  <link rel="stylesheet" href="src/styles/tokens.css">
-  <link rel="stylesheet" href="src/styles/global.css">
-  <link rel="stylesheet" href="src/styles/components.css">
-  <link rel="stylesheet" href="src/styles/responsive.css">
-  <link rel="stylesheet" href="src/styles/motion.css">
+  <meta name="description" content="جزوه تعاملی متابولیسم پروتئین‌ها، جلسه ۵؛ شامل مطالعه، فلش‌کارت، آزمون و تحلیل عملکرد.">
+  <meta name="theme-color" content="#12264b">
+  <title>متابولیسم پروتئین‌ها — جلسه ۵ | HTML Study Note</title>
+  
+<style>
+  /* =========================================================
+     HTML STUDY NOTE BLUEPRINT
+     Design tokens + reusable components
+     ========================================================= */
+  :root {
+    --bg: #f5f7fb;
+    --surface: #ffffff;
+    --surface-2: #f8fafc;
+    --surface-3: #eef2f7;
+    --text: #172033;
+    --text-2: #5f6b7a;
+    --text-3: #8993a1;
+    --primary: #315efb;
+    --primary-2: #2448d8;
+    --primary-soft: #eaf0ff;
+    --accent: #0f9f8f;
+    --accent-soft: #e6f7f4;
+    --warning: #d97706;
+    --warning-soft: #fff4df;
+    --danger: #d14343;
+    --danger-soft: #fdecec;
+    --success: #16835b;
+    --success-soft: #e7f7ef;
+    --border: #dfe5ee;
+    --border-strong: #cbd4e1;
+    --shadow-xs: 0 1px 2px rgba(15, 23, 42, .04);
+    --shadow-sm: 0 6px 20px rgba(15, 23, 42, .06);
+    --shadow-md: 0 14px 40px rgba(15, 23, 42, .09);
+    --radius-sm: 8px;
+    --radius: 14px;
+    --radius-lg: 20px;
+    --content-width: 1180px;
+    --reading-width: 790px;
+    --font-size-base: 16px;
+    --font-family: Vazirmatn, IRANSans, Tahoma, "Segoe UI", sans-serif;
+    --line: 1.9;
+    --header-height: 68px;
+  }
+
+  [data-theme="dark"] {
+    --bg: #0b1120;
+    --surface: #121a2a;
+    --surface-2: #182235;
+    --surface-3: #202b40;
+    --text: #f1f5fb;
+    --text-2: #aab6c7;
+    --text-3: #77849a;
+    --primary: #6d8cff;
+    --primary-2: #87a0ff;
+    --primary-soft: #1b2850;
+    --accent: #35c8b5;
+    --accent-soft: #123b37;
+    --warning: #f2a34b;
+    --warning-soft: #49351d;
+    --danger: #ff7474;
+    --danger-soft: #482225;
+    --success: #42d39a;
+    --success-soft: #123c2d;
+    --border: #28364c;
+    --border-strong: #3a4a63;
+    --shadow-xs: 0 1px 2px rgba(0,0,0,.2);
+    --shadow-sm: 0 8px 24px rgba(0,0,0,.22);
+    --shadow-md: 0 18px 50px rgba(0,0,0,.28);
+  }
+
+  [data-theme="sepia"] {
+    --bg: #f5efe4;
+    --surface: #fffaf1;
+    --surface-2: #f8f0e2;
+    --surface-3: #eee1ce;
+    --text: #3e352a;
+    --text-2: #766957;
+    --text-3: #9a8b76;
+    --primary: #6551c8;
+    --primary-2: #5140aa;
+    --primary-soft: #eeeafd;
+    --accent: #a05a18;
+    --accent-soft: #f8e8d6;
+    --warning: #a05a18;
+    --warning-soft: #f9ead5;
+    --danger: #a93b3b;
+    --danger-soft: #f7dddd;
+    --success: #28734f;
+    --success-soft: #e4f0e8;
+    --border: #e2d5c1;
+    --border-strong: #d2c1a7;
+  }
+
+  [data-font-size="small"] { --font-size-base: 14px; }
+  [data-font-size="medium"] { --font-size-base: 16px; }
+  [data-font-size="large"] { --font-size-base: 18px; }
+
+  * { box-sizing: border-box; }
+
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: calc(var(--header-height) + 24px);
+  }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background:
+      radial-gradient(circle at 10% 0%, rgba(49,94,251,.045), transparent 28rem),
+      var(--bg);
+    color: var(--text);
+    font-family: var(--font-family);
+    font-size: var(--font-size-base);
+    line-height: var(--line);
+    transition: background .2s ease, color .2s ease;
+  }
+
+  button, input, select, textarea { font: inherit; }
+  button { -webkit-tap-highlight-color: transparent; }
+
+  ::selection {
+    background: var(--primary);
+    color: #fff;
+  }
+
+  /* ---------- Header / app chrome ---------- */
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    min-height: var(--header-height);
+    background: color-mix(in srgb, var(--surface) 90%, transparent);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+    box-shadow: var(--shadow-xs);
+  }
+
+  .nav-container {
+    width: min(var(--content-width), calc(100% - 28px));
+    min-height: var(--header-height);
+    margin: auto;
+    padding: 10px 0;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 18px;
+  }
+
+  .logo-title {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    color: var(--text);
+    font-size: 1rem;
+    font-weight: 800;
+    white-space: nowrap;
+  }
+
+  .logo-title span {
+    display: inline-flex;
+    align-items: center;
+    min-height: 38px;
+    padding: 5px 11px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--surface-2);
+  }
+
+  .nav-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+    min-width: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .nav-tabs::-webkit-scrollbar { display: none; }
+
+  .nav-btn {
+    border: 0;
+    background: transparent;
+    color: var(--text-2);
+    padding: 8px 13px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 700;
+    white-space: nowrap;
+    transition: .18s ease;
+  }
+
+  .nav-btn:hover {
+    color: var(--primary);
+    background: var(--primary-soft);
+  }
+
+  .nav-btn.active {
+    color: var(--primary);
+    background: var(--primary-soft);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--primary) 18%, transparent);
+  }
+
+  .nav-actions { display: flex; gap: 7px; }
+
+  .btn-icon {
+    min-height: 38px;
+    padding: 7px 11px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface);
+    color: var(--text);
+    cursor: pointer;
+    transition: .18s ease;
+  }
+
+  .btn-icon:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+    transform: translateY(-1px);
+  }
+
+  /* ---------- Layout ---------- */
+  main {
+    width: min(var(--content-width), calc(100% - 28px));
+    margin: 28px auto 56px;
+  }
+
+  .tab-content { display: none; }
+
+  .tab-content.active {
+    display: block;
+    animation: fadeUp .22s ease both;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(7px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+  }
+
+  /* ---------- Buttons ---------- */
+  .btn {
+    min-height: 42px;
+    padding: 9px 15px;
+    border: 1px solid transparent;
+    border-radius: 10px;
+    background: var(--primary);
+    color: #fff;
+    cursor: pointer;
+    font-weight: 750;
+    transition: .18s ease;
+  }
+
+  .btn:hover {
+    background: var(--primary-2);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .btn-outline {
+    background: var(--surface);
+    color: var(--text);
+    border-color: var(--border-strong);
+  }
+
+  .btn-outline:hover {
+    background: var(--primary-soft);
+    border-color: var(--primary);
+    color: var(--primary);
+  }
+
+  .btn-success { background: var(--success); }
+  .btn-success:hover { background: var(--success); filter: brightness(.92); }
+  .btn-danger { background: var(--danger); }
+  .btn-danger:hover { background: var(--danger); filter: brightness(.92); }
+
+  /* ---------- Lecture blueprint ---------- */
+  .lecture-layout {
+    display: grid;
+    grid-template-columns: 245px minmax(0, var(--reading-width));
+    justify-content: center;
+    gap: 24px;
+    align-items: start;
+  }
+
+  .toc-drawer {
+    position: sticky;
+    top: calc(var(--header-height) + 18px);
+    max-height: calc(100vh - var(--header-height) - 36px);
+    overflow: auto;
+    padding: 15px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-xs);
+  }
+
+  .toc-drawer h3 {
+    margin: 0 0 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+    font-size: .9rem;
+    color: var(--text);
+  }
+
+  .toc-list { list-style: none; margin: 0; padding: 0; }
+  .toc-list li { margin: 2px 0; }
+
+  .toc-list a {
+    display: block;
+    padding: 6px 8px;
+    border-radius: 8px;
+    color: var(--text-2);
+    text-decoration: none;
+    font-size: .84rem;
+    transition: .16s ease;
+  }
+
+  .toc-list a:hover {
+    color: var(--primary);
+    background: var(--primary-soft);
+  }
+
+  .toc-list a.h3-link {
+    padding-right: 18px;
+    font-size: .78rem;
+  }
+
+  .lecture-content {
+    padding: clamp(22px, 4vw, 42px);
+    overflow: hidden;
+  }
+
+  .lecture-content::before {
+    content: "LECTURE NOTE";
+    display: inline-flex;
+    margin-bottom: 13px;
+    padding: 4px 9px;
+    border-radius: 999px;
+    background: var(--primary-soft);
+    color: var(--primary);
+    font-size: .67rem;
+    font-weight: 900;
+    letter-spacing: .08em;
+  }
+
+  .lecture-content h2 {
+    margin: 2.1rem 0 .8rem;
+    padding-bottom: .55rem;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+    font-size: clamp(1.25rem, 2vw, 1.55rem);
+    line-height: 1.45;
+    position: relative;
+  }
+
+  .lecture-content h2:first-of-type { margin-top: .25rem; }
+
+  .lecture-content h2::after {
+    content: "";
+    display: block;
+    width: 42px;
+    height: 3px;
+    margin-top: 9px;
+    border-radius: 999px;
+    background: var(--primary);
+  }
+
+  .lecture-content h3 {
+    margin: 1.45rem 0 .55rem;
+    color: var(--accent);
+    font-size: 1.05rem;
+  }
+
+  .lecture-content p {
+    margin: 0 0 1rem;
+    color: var(--text);
+    text-align: justify;
+    text-wrap: pretty;
+  }
+
+  .lecture-content strong { color: var(--primary); }
+
+  /* Reusable note components */
+  .note-callout {
+    margin: 1.25rem 0;
+    padding: 15px 17px;
+    border: 1px solid var(--border);
+    border-right: 4px solid var(--primary);
+    border-radius: 12px;
+    background: var(--surface-2);
+  }
+
+  .note-callout.info { border-right-color: var(--primary); }
+  .note-callout.success { border-right-color: var(--success); background: var(--success-soft); }
+  .note-callout.warning { border-right-color: var(--warning); background: var(--warning-soft); }
+  .note-callout.danger { border-right-color: var(--danger); background: var(--danger-soft); }
+
+  .note-callout-title {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin-bottom: 5px;
+    font-weight: 850;
+  }
+
+  .key-facts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 10px;
+    margin: 1.25rem 0;
+  }
+
+  .key-fact {
+    padding: 13px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+  }
+
+  .key-fact-label {
+    margin-bottom: 3px;
+    color: var(--text-3);
+    font-size: .72rem;
+    font-weight: 800;
+  }
+
+  .key-fact-value {
+    font-weight: 800;
+    line-height: 1.55;
+  }
+
+  .memory-hook {
+    margin: 1.25rem 0;
+    padding: 16px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, var(--primary-soft), var(--surface));
+    border: 1px solid color-mix(in srgb, var(--primary) 20%, var(--border));
+  }
+
+  .memory-hook-title {
+    color: var(--primary);
+    font-size: .78rem;
+    font-weight: 900;
+    margin-bottom: 5px;
+  }
+
+  .formula-box {
+    margin: 1.25rem 0;
+    padding: 16px;
+    direction: ltr;
+    text-align: center;
+    background: var(--surface-2);
+    border: 1px dashed var(--border-strong);
+    border-radius: 12px;
+    font-family: "SFMono-Regular", Consolas, monospace;
+    overflow-x: auto;
+  }
+
+  .mini-table {
+    width: 100%;
+    margin: 1.25rem 0;
+    border-collapse: separate;
+    border-spacing: 0;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+  }
+
+  .mini-table th,
+  .mini-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    text-align: right;
+  }
+
+  .mini-table th {
+    background: var(--surface-2);
+    font-weight: 850;
+  }
+
+  .mini-table tr:last-child td { border-bottom: 0; }
+
+  .diagram-container {
+    margin: 1.5rem 0;
+    padding: 18px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    text-align: center;
+    overflow-x: auto;
+  }
+
+  .diagram-container svg {
+    max-width: 100%;
+    height: auto;
+  }
+
+  .diagram-caption {
+    margin-top: 8px;
+    color: var(--text-3);
+    font-size: .76rem;
+  }
+
+  /* ---------- Flashcards ---------- */
+  .flashcard-scene {
+    perspective: 1200px;
+    max-width: 610px;
+    height: 315px;
+    margin: 28px auto 18px;
+    cursor: pointer;
+  }
+
+  .flashcard {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform .62s cubic-bezier(.2,.75,.2,1);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+  }
+
+  .flashcard.is-flipped { transform: rotateY(180deg); }
+
+  .flashcard-face {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 34px;
+    text-align: center;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+  }
+
+  .flashcard-front { border-top: 5px solid var(--primary); }
+  .flashcard-back {
+    transform: rotateY(180deg);
+    border-top: 5px solid var(--accent);
+    background: var(--surface);
+  }
+
+  .flashcard-controls {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+  }
+
+  /* ---------- Quiz ---------- */
+  .quiz-options-grid { display: grid; gap: 9px; margin: 16px 0; }
+
+  .option-btn {
+    width: 100%;
+    min-height: 50px;
+    padding: 11px 13px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-align: right;
+    border: 1px solid var(--border);
+    border-radius: 11px;
+    background: var(--surface);
+    color: var(--text);
+    cursor: pointer;
+    transition: .16s ease;
+  }
+
+  .option-btn:hover:not(:disabled) {
+    border-color: var(--primary);
+    background: var(--primary-soft);
+    transform: translateX(-2px);
+  }
+
+  .option-btn.correct {
+    background: var(--success-soft);
+    border-color: var(--success);
+    color: var(--success);
+  }
+
+  .option-btn.incorrect {
+    background: var(--danger-soft);
+    border-color: var(--danger);
+    color: var(--danger);
+  }
+
+  .explanation-box {
+    margin-top: 15px;
+    padding: 14px 16px;
+    border: 1px solid var(--border);
+    border-right: 4px solid var(--primary);
+    border-radius: 11px;
+    background: var(--surface-2);
+    font-size: .9rem;
+  }
+
+  .matching-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin: 16px 0;
+  }
+
+  .matching-item {
+    padding: 11px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface);
+    cursor: pointer;
+    text-align: center;
+    user-select: none;
+    transition: .16s ease;
+  }
+
+  .matching-item.selected {
+    border-color: var(--primary);
+    background: var(--primary-soft);
+    font-weight: 800;
+  }
+
+  .matching-item.matched {
+    background: var(--success-soft);
+    border-color: var(--success);
+    cursor: default;
+  }
+
+  /* ---------- Analytics ---------- */
+  .bar-chart-container { display: flex; flex-direction: column; gap: 10px; margin-top: 12px; }
+
+  .chart-row {
+    display: grid;
+    grid-template-columns: 140px 1fr 52px;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .bar-track {
+    height: 10px;
+    overflow: hidden;
+    position: relative;
+    background: var(--surface-3);
+    border-radius: 999px;
+  }
+
+  .bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary), var(--accent));
+    border-radius: inherit;
+    transition: width .5s ease;
+  }
+
+  .table-container { overflow-x: auto; margin-top: 12px; }
+
+  table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: .88rem;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  th, td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    text-align: right;
+  }
+
+  th { background: var(--surface-2); font-weight: 850; }
+  tr:last-child td { border-bottom: 0; }
+
+  /* ---------- Forms / modal ---------- */
+  .form-group { margin-bottom: 15px; }
+
+  .form-group label {
+    display: block;
+    margin-bottom: 6px;
+    color: var(--text-2);
+    font-size: .82rem;
+    font-weight: 800;
+  }
+
+  select, input[type="text"], input[type="number"] {
+    width: 100%;
+    min-height: 43px;
+    padding: 9px 11px;
+    border: 1px solid var(--border-strong);
+    border-radius: 10px;
+    outline: none;
+    background: var(--surface);
+    color: var(--text);
+  }
+
+  select:focus, input[type="text"]:focus, input[type="number"]:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--primary-soft);
+  }
+
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 18px;
+    background: rgba(8, 15, 30, .55);
+    backdrop-filter: blur(7px);
+  }
+
+  .modal-overlay.open { display: flex; }
+
+  .modal-card {
+    width: min(520px, 100%);
+    max-height: min(760px, 90vh);
+    overflow: auto;
+    padding: 22px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+  }
+
+  /* ---------- Blueprint helpers ---------- */
+  .section-meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 7px;
+    margin-bottom: 12px;
+  }
+
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    min-height: 25px;
+    padding: 3px 8px;
+    border-radius: 999px;
+    background: var(--surface-3);
+    color: var(--text-2);
+    font-size: .68rem;
+    font-weight: 850;
+  }
+
+  .tag.primary { background: var(--primary-soft); color: var(--primary); }
+  .tag.accent { background: var(--accent-soft); color: var(--accent); }
+  .tag.warning { background: var(--warning-soft); color: var(--warning); }
+
+  .content-divider {
+    height: 1px;
+    margin: 26px 0;
+    background: var(--border);
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0,0,0,0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 920px) {
+    .nav-container {
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+    }
+
+    .nav-tabs {
+      grid-column: 1 / -1;
+      grid-row: 2;
+      justify-content: flex-start;
+    }
+
+    .lecture-layout {
+      grid-template-columns: 1fr;
+      justify-content: stretch;
+    }
+
+    .toc-drawer {
+      position: relative;
+      top: 0;
+      max-height: 260px;
+      order: 0;
+    }
+  }
+
+  @media (max-width: 600px) {
+    :root { --header-height: 112px; }
+
+    main {
+      width: min(100% - 18px, var(--content-width));
+      margin-top: 16px;
+    }
+
+    .nav-container {
+      width: calc(100% - 18px);
+    }
+
+    .logo-title { font-size: .88rem; }
+    .logo-title span { min-height: 34px; }
+
+    .nav-btn { padding: 7px 10px; font-size: .82rem; }
+
+    .lecture-content { padding: 19px; }
+    .flashcard-scene { height: 280px; }
+    .flashcard-face { padding: 23px; }
+
+    .matching-container { grid-template-columns: 1fr; }
+
+    .chart-row {
+      grid-template-columns: 95px 1fr 45px;
+      gap: 7px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      scroll-behavior: auto !important;
+      transition-duration: .01ms !important;
+      animation-duration: .01ms !important;
+    }
+  }
+  /* ---------- GUMS branded visual hero ---------- */
+  .gums-hero {
+    width: 100%;
+    background: #f7fbff;
+    border-bottom: 1px solid var(--border);
+    overflow: hidden;
+  }
+
+  .gums-hero img {
+    display: block;
+    width: 100%;
+    height: auto;
+    margin: 0 auto;
+  }
+
+  @media (max-width: 600px) {
+    .gums-hero {
+      background: #f3f9ff;
+    }
+
+    .gums-hero img {
+      width: 100%;
+      min-height: 118px;
+      object-fit: contain;
+    }
+  }
+
+</style>
+
 </head>
+
 <body>
-  <main id="app">
-    <section data-component="header"></section>
-    <section data-component="hero"></section>
-    <section data-component="navigation"></section>
-    <section data-component="lecture"></section>
-    <section data-component="flashcard"></section>
-    <section data-component="quiz"></section>
-    <section data-component="result"></section>
-    <section data-component="progress"></section>
-    <section data-component="modal"></section>
+
+  <section class="gums-hero" aria-label="GUMS Dentistry Mehr branded header">
+    <img src="data:image/webp;base64,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" alt="GUMS Dentistry Mehr — modern dental hero header">
+  </section>
+
+  <header>
+    <div class="nav-container">
+      <div class="logo-title"><span>بیوشیمی · متابولیسم پروتئین</span></div>
+      <nav class="nav-tabs">
+        <button class="nav-btn active" data-tab="lecture">جزوه</button>
+        <button class="nav-btn" data-tab="flashcards">فلش‌کارت</button>
+        <button class="nav-btn" data-tab="quiz">آزمون</button>
+        <button class="nav-btn" data-tab="analytics">تحلیل عملکرد</button>
+      </nav>
+      <div class="nav-actions">
+        <button class="btn-icon" id="btnSettingsModal" title="تنظیمات ظاهر">⚙️ تنظیمات</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- TAB 1: LECTURE -->
+    <section id="tab-lecture" class="tab-content active">
+      <div class="lecture-layout">
+        <aside class="toc-drawer">
+          <h3>فهرست مطالب</h3>
+          <ul class="toc-list" id="tocList"></ul>
+        </aside>
+        <article class="lecture-content card" id="lectureArticle">
+          <div class="section-meta">
+            <span class="tag primary">بیوشیمی دیسیپلین</span>
+            <span class="tag">دکتر آقاجانی</span>
+            <span class="tag accent">متابولیسم پروتئین‌ها</span>
+            <span class="tag">جلسه ۵</span>
+          </div>
+
+          <h2 id="sec-carbon">متابولیسم اسکلت کربنی</h2>
+          <p>
+            وقتی آمینواسید عامل آمین خود را از دست می‌دهد، اسکلت کربنی باقی‌مانده می‌تواند
+            از جایگاه‌های مختلف وارد سیکل کربس شود و متابولیزه گردد. در ادامه، محصولات احیایی
+            حاصل از سیکل کربس یعنی NADH و FADH از طریق زنجیره تنفسی به تولید ATP کمک می‌کنند.
+          </p>
+
+          <div class="note-callout info">
+            <div class="note-callout-title">اصل مفهومی</div>
+            <div>سیکل کربس در این جزوه به‌عنوان یک «شاهراه متابولیک» معرفی شده است؛ گلوکز از مسیر پیرووات و آمینواسیدها از چندین جایگاه مختلف به این مسیر می‌رسند.</div>
+          </div>
+
+          <h3 id="sec-keto-gluco">کتوژنیک و گلوکوژنیک</h3>
+          <p>
+            آمینواسیدهایی که پس از حذف عامل آمین، پیرووات، استیل‌کوآنزیم A یا استواستیل‌کوآنزیم A
+            می‌سازند، در گروه کتوژنیک قرار می‌گیرند. گلوکوژنیک‌ها می‌توانند از مسیر پیرووات،
+            آلفاکتوگلوتارات، سوکسینیل‌کوآنزیم A، فومارات یا اگزالواستات به متابولیسم وارد شوند.
+          </p>
+
+          <div class="key-facts">
+            <div class="key-fact">
+              <div class="key-fact-label">صرفاً کتوژنیک</div>
+              <div class="key-fact-value">لوسین + لایزین</div>
+            </div>
+            <div class="key-fact">
+              <div class="key-fact-label">هم کتوژنیک هم گلوکوژنیک</div>
+              <div class="key-fact-value">ایزولوسین، فنیل‌آلانین، تریپتوفان، تیروزین</div>
+            </div>
+            <div class="key-fact">
+              <div class="key-fact-label">گلوکوژنیک</div>
+              <div class="key-fact-value">بقیهٔ آمینواسیدها</div>
+            </div>
+          </div>
+
+          <div class="memory-hook">
+            <div class="memory-hook-title">MEMORY HOOK — طبقه‌بندی</div>
+            <div>۲ آمینواسید فقط کتوژنیک‌اند؛ ۴ آمینواسید هم کتوژنیک و هم گلوکوژنیک‌اند؛ بقیه گلوکوژنیک‌اند.</div>
+          </div>
+
+          <h2 id="sec-carbon-fates">سرنوشت اتم‌های کربن</h2>
+          <p>در متن جزوه تأکید شده است که نیازی به حفظ شکل اسلاید نیست و درک مسیرهای ورود به سیکل کربس کفایت می‌کند.</p>
+
+          <div class="diagram-container">
+            <svg viewBox="0 0 820 330" role="img" aria-label="مسیرهای ورود اسکلت کربنی آمینواسیدها به سیکل کربس" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <marker id="arrow2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                  <path d="M 0 0 L 10 5 L 0 10 z" fill="currentColor"/>
+                </marker>
+              </defs>
+              <rect x="295" y="105" width="230" height="115" rx="18" fill="var(--primary-soft)" stroke="var(--primary)" stroke-width="2"/>
+              <text x="410" y="150" text-anchor="middle" font-size="24" font-weight="800" fill="var(--primary)">سیکل کربس</text>
+              <text x="410" y="182" text-anchor="middle" font-size="15" fill="var(--text-2)">شاهراه متابولیک</text>
+
+              <g font-size="15" text-anchor="middle">
+                <text x="85" y="45" fill="var(--text)">پیرووات</text>
+                <text x="245" y="45" fill="var(--text)">استیل-CoA</text>
+                <text x="395" y="45" fill="var(--text)">استواستیل-CoA</text>
+                <text x="565" y="45" fill="var(--text)">آلفاکتوگلوتارات</text>
+                <text x="735" y="45" fill="var(--text)">سوکسینیل-CoA</text>
+                <text x="170" y="300" fill="var(--text)">فومارات</text>
+                <text x="650" y="300" fill="var(--text)">اگزالواستات</text>
+              </g>
+
+              <g stroke="var(--accent)" stroke-width="3" fill="none" marker-end="url(#arrow2)">
+                <path d="M 105 58 C 155 95, 225 112, 295 132"/>
+                <path d="M 245 58 C 280 95, 320 112, 330 120"/>
+                <path d="M 395 58 C 400 84, 405 95, 405 105"/>
+                <path d="M 565 58 C 535 100, 505 120, 525 140"/>
+                <path d="M 720 58 C 640 92, 585 120, 525 155"/>
+                <path d="M 190 278 C 245 245, 280 230, 310 220"/>
+                <path d="M 625 278 C 570 245, 540 230, 515 215"/>
+              </g>
+
+              <rect x="590" y="88" width="180" height="46" rx="12" fill="var(--surface-2)" stroke="var(--border)"/>
+              <text x="680" y="117" text-anchor="middle" font-size="13" fill="var(--text-2)">آسپارژین + آسپارتیک اسید</text>
+              <path d="M 650 135 C 610 155, 570 170, 525 180" stroke="var(--warning)" stroke-width="2.5" fill="none" marker-end="url(#arrow2)"/>
+
+              <text x="410" y="322" text-anchor="middle" font-size="13" fill="var(--text-3)">شکل مفهومی بر اساس مسیرهای ذکرشده در جزوه</text>
+            </svg>
+          </div>
+
+          <h3 id="sec-entry-points">۷ جایگاه ورود ذکرشده در جزوه</h3>
+          <ol style="padding-right:1.25rem; margin:0 0 1rem;">
+            <li>تبدیل به پیرووات</li>
+            <li>تبدیل به استیل‌کوآنزیم A</li>
+            <li>تبدیل به استواستیل‌کوآنزیم</li>
+            <li>ورود از محل آلفاکتوگلوتارات</li>
+            <li>ورود از محل سوکسینیل‌کوآنزیم A</li>
+            <li>ورود از محل فومارات</li>
+            <li>آسپارژین و آسپارتیک اسید از طریق اگزالواستات</li>
+          </ol>
+
+          <h2 id="sec-biosynthesis">بیوسنتز آمینواسیدها</h2>
+          <p>
+            آمینواسیدها در شرایط نرمال به دو گروه ضروری و غیرضروری تقسیم می‌شوند. ضروری‌ها از راه
+            مواد غذایی دریافت می‌شوند و غیرضروری‌ها با کمک واکنش‌های متابولیک در بدن ساخته می‌شوند.
+            جزوه اشاره می‌کند که بیماری‌ها می‌توانند این مرزبندی را تغییر دهند.
+          </p>
+
+          <div class="note-callout warning">
+            <div class="note-callout-title">نکتهٔ امتحانی — تعداد آنزیم‌ها</div>
+            <div>در متن جزوه برای ساخت مجموعهٔ آمینواسیدهای غیرضروری ۱۷ آنزیم و برای آمینواسیدهای ضروری ۵۹ آنزیم ذکر شده است؛ همچنین تأکید شده که ساخت آمینواسیدهای شاخه‌دار می‌تواند به آنزیم‌های بیشتری نیاز داشته باشد.</div>
+          </div>
+
+          <h3 id="sec-nonessential">واکنش‌های ساخت آمینواسیدهای غیرضروری</h3>
+          <div class="key-facts">
+            <div class="key-fact">
+              <div class="key-fact-label">۱</div>
+              <div class="key-fact-value">آلفاکتوگلوتارات + عامل آمین → گلوتامیک اسید؛ آنزیم: گلوتامات دهیدروژناز</div>
+            </div>
+            <div class="key-fact">
+              <div class="key-fact-label">۲</div>
+              <div class="key-fact-value">گلوتامیک اسید + آمونیاک → گلوتامین؛ آنزیم: گلوتامین سنتاز</div>
+            </div>
+            <div class="key-fact">
+              <div class="key-fact-label">۳</div>
+              <div class="key-fact-value">آسپارتیک اسید + عامل آمین → آسپاراژین؛ آنزیم: آسپاراژین سنتاز</div>
+            </div>
+          </div>
+
+          <h3 id="sec-transamination">ترانس‌آمیناسیون و مشتقات پیرووات</h3>
+          <p>
+            آلانین و آسپارتیک اسید می‌توانند از پیرووات حاصل شوند. افزودن عامل آمین به پیرووات
+            باعث ایجاد آلانین می‌شود. در جزوه همچنین تشکیل آسپارتیک اسید از آلفاکتوگلوتارات در حضور
+            آلانین به‌عنوان یک واکنش ترنس‌آمیناسیون مطرح شده است.
+          </p>
+
+          <h3 id="sec-serine">سرین، گلایسین و سیستئین</h3>
+          <p>
+            سرین از فسفوگلیسرات ساخته می‌شود. از سرین می‌توان گلایسین ساخت و سیستئین نیز می‌تواند
+            از سرین ایجاد شود. در متن جزوه، شباهت ساختاری سرین و سیستئین با OH و SH و همچنین
+            شباهت هموسرین و هموسیستئین با همین الگوی OH/SH مورد تأکید قرار گرفته است.
+          </p>
+
+          <div class="note-callout info">
+            <div class="note-callout-title">مسیر سیستئین</div>
+            <div>سرین + هموسیستئین ← سیستاتیونین با آنزیم <strong>سیستاتیونین سنتاز</strong>؛ سپس سیستاتیونین توسط <strong>سیستاتیوناز</strong> شکسته می‌شود و سیستئین و هموسرین آزاد می‌شوند.</div>
+          </div>
+
+          <h3 id="sec-proline">تشکیل پرولین</h3>
+          <p>از گلوتامیک اسید طی سه واکنش، فرم حلقوی ایجاد شده و در نهایت پرولین ساخته می‌شود.</p>
+
+          <h2 id="sec-tyrosine">تبدیل فنیل‌آلانین به تیروزین</h2>
+          <p>
+            در این مسیر، فنیل‌آلانین با یک واکنش هیدروکسیلاسیون به تیروزین تبدیل می‌شود. آنزیم این
+            واکنش <strong>فنیل‌آلانین هیدروکسیلاز</strong> است و کوآنزیم ذکرشده در جزوه
+            <strong>تتراهیدروبیوپترین</strong> است. در واکنش، تتراهیدروبیوپترین به دی‌هیدروبیوپترین
+            تبدیل می‌شود و برای بازسازی فرم تترا، آنزیم دی‌هیدروبیوپترین ردوکتاز و NADPH لازم‌اند.
+          </p>
+
+          <div class="formula-box">Phenylalanine + O₂ + Tetrahydrobiopterin → Tyrosine + H₂O + Quinonoid biopterin</div>
+
+          <div class="key-facts">
+            <div class="key-fact">
+              <div class="key-fact-label">Enzyme</div>
+              <div class="key-fact-value">Phenylalanine hydroxylase</div>
+            </div>
+            <div class="key-fact">
+              <div class="key-fact-label">Cofactor</div>
+              <div class="key-fact-value">Tetrahydrobiopterin</div>
+            </div>
+            <div class="key-fact">
+              <div class="key-fact-label">Regeneration</div>
+              <div class="key-fact-value">Dihydrobiopterin reductase + NADPH</div>
+            </div>
+          </div>
+
+          <div class="note-callout danger">
+            <div class="note-callout-title">PKU / Hyperphenylalaninemia</div>
+            <div>طبق جزوه، اگر فنیل‌آلانین نتواند به تیروزین تبدیل شود، فنیل‌آلانین افزایش می‌یابد و می‌تواند وارد مسیرهای فرعی شده و محصولات سمی ایجاد کند. جزوه بر تشخیص زودهنگام و محدودیت فنیل‌آلانین غذایی تأکید دارد.</div>
+          </div>
+
+          <h3 id="sec-hydroxy">هیدروکسی‌پروline و هیدروکسی‌لایزین</h3>
+          <p>
+            این ترکیبات با یک واکنش هیدروکسیلاسیون ایجاد می‌شوند؛ گروه OH به پرولین یا لایزین اضافه می‌شود.
+            جزوه ذکر می‌کند که آنزیم‌های هیدروکسیلاز برای عملکرد خود به آهن و ویتامین C نیاز دارند.
+          </p>
+
+          <h2 id="sec-renal">اختلالات مربوط به آمینواسیدها و پروتئین‌ها</h2>
+          <p>
+            در شرایط نرمال، آمینواسیدها از راه ادرار دفع نمی‌شوند، زیرا کلیه آن‌ها را بازجذب می‌کند.
+            متن جزوه مسیر کلی را این‌گونه جمع‌بندی می‌کند: ورود از روده و دستگاه گوارش، متابولیسم در خون،
+            و خروج از بدن عمدتاً از مسیر کلیه؛ بنابراین اختلال می‌تواند در ورود، متابولیسم یا بازجذب رخ دهد.
+          </p>
+
+          <div class="key-facts">
+            <div class="key-fact">
+              <div class="key-fact-label">ورود</div>
+              <div class="key-fact-value">روده و دستگاه گوارش</div>
+            </div>
+            <div class="key-fact">
+              <div class="key-fact-label">متابولیسم</div>
+              <div class="key-fact-value">در خون / بافت‌ها</div>
+            </div>
+            <div class="key-fact">
+              <div class="key-fact-label">بازجذب</div>
+              <div class="key-fact-value">توبول‌های کلیوی</div>
+            </div>
+          </div>
+
+          <h3 id="sec-glycinuria">Glycinuria و Hyperoxaluria</h3>
+          <p>
+            در <strong>glycinuria</strong> گلایسین از ادرار دفع می‌شود و در متن به اختلال بازجذب توبولی اشاره شده است.
+            جزوه دفع گلایسین را با تشکیل سنگ‌های اگزالاتی مرتبط می‌کند.
+          </p>
+          <p>
+            در <strong>hyperoxaluria</strong>، glyoxylate از گلایسین ایجاد می‌شود و اختلال در دفع آن در جزوه
+            با التهاب و عفونت سیستم ادراری مطرح شده است.
+          </p>
+
+          <h3 id="sec-cystinuria">Cystinuria</h3>
+          <p>
+            در این بیماری، سیستئین همراه با لایزین، آرژینین و اورنیتین دفع می‌شوند و متن تأکید می‌کند
+            که مقدار دفع سیستئین از سایر آمینواسیدهای ذکرشده بیشتر است. به علت نامحلول بودن سیستئین در آب،
+            سنگ‌های سیستئینی ایجاد می‌شوند؛ جزوه این سنگ‌ها را خوش‌خیم توصیف می‌کند.
+          </p>
+
+          <h3 id="sec-cystinosis">Cystinosis</h3>
+          <p>
+            در cystinosis نقص لیزوزومی مطرح است و کریستال‌های نامحلول سیستئین در بافت‌ها رسوب می‌کنند.
+            متن به aminoaciduria اشاره می‌کند و توضیح می‌دهد که آسیب سلول‌های کلیه می‌تواند بازجذب را مختل کرده
+            و دفع بسیاری از آمینواسیدها را از طریق ادرار افزایش دهد. در جزوه، مرگ زودرس ناشی از اختلالات شدید کلیوی ذکر شده است.
+          </p>
+
+          <h2 id="sec-histidine">متابولیسم هیستیدین</h2>
+          <p>
+            هیستیدین در جزوه آمینواسیدی با pH ایزوالکتریک نزدیک به pH رایج بدن معرفی شده و برای ساختار هموگلوبین اهمیت دارد.
+          </p>
+
+          <div class="mini-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>مرحله</th>
+                  <th>آنزیم / تغییر</th>
+                  <th>محصول</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>۱</td><td>هیستیداز</td><td>اوراکانات / Urocanic acid</td></tr>
+                <tr><td>۲</td><td>اوراکاناز</td><td>ایمیدازول پروپیونات</td></tr>
+                <tr><td>ادامهٔ مسیر</td><td>تبدیل واسطه‌ای</td><td>N-formiminoglutamate → گلوتامات</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="memory-hook">
+            <div class="memory-hook-title">HIGH-YIELD</div>
+            <div>حاصل نهایی کاتابولیسم هیستیدین در متن جزوه: <strong>گلوتامیک اسید / گلوتامات</strong>.</div>
+          </div>
+
+          <h3 id="sec-histidine-disorders">اختلالات متابولیک هیستیدین</h3>
+          <p>
+            در <strong>histidinemia</strong> مشکل در هیستیداز ایجاد می‌شود، بنابراین میزان هیستیدین افزایش می‌یابد.
+            در جزوه این افزایش با عقب‌ماندگی ذهنی مرتبط شده است.
+          </p>
+          <p>
+            در <strong>urocanic aciduria</strong> نقص اوراکاناز مطرح است و حضور اوراکانیک اسید، ایمیدازول استات
+            یا ایمیدازول پیرووات در ادرار می‌تواند نشانهٔ نقص در متابولیسم هیستیدین باشد. متن به استفاده از
+            پنل‌های ادراری برای بررسی متابولیت‌ها اشاره می‌کند.
+          </p>
+
+          <h2 id="sec-bcaa">آمینواسیدهای شاخه‌دار</h2>
+          <p>
+            والین، لوسین و ایزولوسین در کاتابولیسم مسیرهای مشترکی دارند. در متن جزوه ابتدا عامل آمینی برداشته می‌شود،
+            سپس دهیدروژناز روی آن‌ها عمل می‌کند. سه مسیر اول برای هر سه آمینواسید مشابه معرفی شده و یک کمپلکس آنزیمی مشترک مطرح می‌شود.
+          </p>
+
+          <div class="key-facts">
+            <div class="key-fact">
+              <div class="key-fact-label">BCAA</div>
+              <div class="key-fact-value">Valine · Leucine · Isoleucine</div>
+            </div>
+            <div class="key-fact">
+              <div class="key-fact-label">اصل مشترک</div>
+              <div class="key-fact-value">مسیرهای اولیهٔ مشابه</div>
+            </div>
+            <div class="key-fact">
+              <div class="key-fact-label">نکته</div>
+              <div class="key-fact-value">یک کمپلکس آنزیمی برای هر سه</div>
+            </div>
+          </div>
+
+          <h3 id="sec-msud">Maple Syrup Urine Disease</h3>
+          <p>
+            در جزوه، این بیماری با نام <strong>Maple Syrup urine disease</strong> و نیز
+            <strong>branched-chain ketonuria</strong> آمده است. ویژگی شناخته‌شده در متن، بوی شیرهٔ درخت افرا
+            یا شکر سوخته در ادرار است.
+          </p>
+          <p>
+            نقص در «alpha-ketoacid decarboxylase complex» باعث افزایش لوسین، والین، ایزولوسین و آلفاکتو اسیدها
+            می‌شود و متن از آسیب شدید مغزی، امکان مرگ و اهمیت تشخیص در هفتهٔ اول تولد سخن می‌گوید.
+          </p>
+
+          <div class="note-callout warning">
+            <div class="note-callout-title">درمان طبق جزوه</div>
+            <div>در صورت شناسایی نقص، تغذیه با شیر مخصوص محدودشده از نظر آمینواسیدهای شاخه‌دار مطرح شده است. جزوه بر غربالگری نوزادان و شروع سریع درمان برای جلوگیری از آسیب برگشت‌ناپذیر تأکید دارد.</div>
+          </div>
+
+          <h2 id="sec-enzyme-defect">شدت نقص آنزیمی</h2>
+          <p>
+            آنزیم ساختار پروتئینی دارد و دارای جایگاه فعال است. جهش می‌تواند اتصال سوبسترا به جایگاه فعال را مختل کند
+            و مقدار محصول را کاهش دهد یا متوقف کند. شدت بیماری به میزان اختلال فعالیت آنزیم وابسته است.
+          </p>
+
+          <div class="formula-box">فعالیت آنزیم ↓ → تولید محصول ↓ → شدت نقص متغیر از خفیف تا شدید</div>
+
+          <h2 id="sec-pku-types">انواع PKU و درمان</h2>
+          <p>
+            طبق اسلاید و متن جزوه، وقتی فنیل‌آلانین به تیروزین تبدیل نمی‌شود، PKU یا
+            hyperphenylalaninemia ایجاد می‌شود. نوع نقص باید مشخص شود تا درمان مناسب انتخاب شود.
+          </p>
+
+          <div class="mini-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>نوع</th>
+                  <th>نقص ذکرشده در جزوه</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>Type I</td><td>نقص فنیل‌آلانین هیدروکسیلاز</td></tr>
+                <tr><td>Type II, III</td><td>نقص دی‌هیدروبیوپترین ردوکتاز</td></tr>
+                <tr><td>Type IV, V</td><td>نقص در بیوسنتز دی‌هیدروبیوپترین</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="note-callout info">
+            <div class="note-callout-title">تفاوت درمان</div>
+            <div>
+              اگر فنیل‌آلانین هیدروکسیلاز کار نکند، طبق جزوه فنیل‌آلانین رژیم غذایی نوزاد باید حذف و تیروزین اضافه شود.
+              اگر مشکل در دی‌هیدروبیوپترین / تتراهیدروبیوپترین باشد، خود این ترکیبات می‌توانند به‌صورت مکمل مطرح شوند.
+            </div>
+          </div>
+
+          <h2 id="sec-rapid-review">مرور سریع قبل از امتحان</h2>
+
+          <div class="key-facts">
+            <div class="key-fact">
+              <div class="key-fact-label">صرفاً ketogenic</div>
+              <div class="key-fact-value">Leucine + Lysine</div>
+            </div>
+            <div class="key-fact">
+              <div class="key-fact-label">هر دو</div>
+              <div class="key-fact-value">Isoleucine + Phenylalanine + Tryptophan + Tyrosine</div>
+            </div>
+            <div class="key-fact">
+              <div class="key-fact-label">Phenylalanine → Tyrosine</div>
+              <div class="key-fact-value">Phenylalanine hydroxylase + BH4 + NADPH regeneration</div>
+            </div>
+            <div class="key-fact">
+              <div class="key-fact-label">Histidine</div>
+              <div class="key-fact-value">Histidase → Urocanate → ... → Glutamate</div>
+            </div>
+            <div class="key-fact">
+              <div class="key-fact-label">BCAA</div>
+              <div class="key-fact-value">Valine + Leucine + Isoleucine</div>
+            </div>
+            <div class="key-fact">
+              <div class="key-fact-label">MSUD</div>
+              <div class="key-fact-value">بوی شیرهٔ افرا + نقص کمپلکس ذکرشده + آسیب مغزی</div>
+            </div>
+          </div>
+
+          <div class="note-callout danger">
+            <div class="note-callout-title">مرز منبع</div>
+            <div>این جزوهٔ HTML بر اساس محتوای PDF جلسهٔ ۵ ساخته شده است. عباراتی که ممکن است در ادبیات استاندارد کتاب‌ها نام‌گذاری یا جزئیات متفاوتی داشته باشند، در این نسخه مطابق همان جزوه نگه داشته شده‌اند.</div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- TAB 2: FLASHCARDS -->
+    <section id="tab-flashcards" class="tab-content">
+      <div class="card" style="max-width: 600px; margin: 0 auto 1.5rem auto;">
+        <div style="display: flex; gap: 1rem; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+          <div style="flex: 1; min-width: 150px;">
+            <label for="fcTopicFilter" style="font-size: 0.85rem; font-weight: bold;">فیلتر مبحث:</label>
+            <select id="fcTopicFilter">
+              <option value="all">همه مباحث</option>
+              <option value="اسکلت کربنی">اسکلت کربنی</option>
+              <option value="کتوژنیک/گلوکوژنیک">کتوژنیک/گلوکوژنیک</option>
+              <option value="بیوسنتز">بیوسنتز</option>
+              <option value="PKU">PKU</option>
+              <option value="اختلالات کلیوی">اختلالات کلیوی</option>
+              <option value="هیستیدین">هیستیدین</option>
+              <option value="BCAA">BCAA</option>
+              <option value="نقص آنزیمی">نقص آنزیمی</option>
+            </select>
+          </div>
+          <div style="text-align: left; font-size: 0.9rem; color: var(--text-muted);">
+            پیشرفت: <span id="fcProgressText" style="font-weight: bold; color: var(--primary);">۰ از ۰</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="flashcard-scene" id="fcScene">
+        <div class="flashcard" id="flashcardElement">
+          <div class="flashcard-face flashcard-front">
+            <span style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.5rem;" id="fcTopicLabel">مبحث</span>
+            <p id="fcFrontText" style="font-size: 1.1rem; font-weight: 500;">متن روی کارت</p>
+            <span style="font-size: 0.75rem; color: var(--text-muted); margin-top: 1rem;">(برای دیدن پاسخ کلیک کنید)</span>
+          </div>
+          <div class="flashcard-face flashcard-back">
+            <span style="font-size: 0.8rem; color: var(--accent); margin-bottom: 0.5rem;">پاسخ و توضیحات</span>
+            <p id="fcBackText" style="font-size: 1.05rem;">متن پشت کارت</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="flashcard-controls">
+        <button class="btn btn-outline" id="fcPrevBtn">قبلی</button>
+        <button class="btn btn-danger" id="fcUnknownBtn">❌ بلد نبودم</button>
+        <button class="btn btn-success" id="fcKnownBtn">✔️ بلد بودم</button>
+        <button class="btn btn-outline" id="fcNextBtn">بعدی</button>
+      </div>
+    </section>
+
+    <!-- TAB 3: QUIZ -->
+    <section id="tab-quiz" class="tab-content">
+      <!-- Quiz Setup Panel -->
+      <div class="card" id="quizSetupPanel" style="max-width: 600px; margin: 0 auto;">
+        <h2 style="margin-bottom: 1rem; color: var(--primary);">تنظیم و شروع آزمون</h2>
+        <div class="form-group">
+          <label for="quizTopic">مبحث آزمون:</label>
+          <select id="quizTopic">
+              <option value="all">همه مباحث</option>
+              <option value="اسکلت کربنی">اسکلت کربنی</option>
+              <option value="کتوژنیک/گلوکوژنیک">کتوژنیک/گلوکوژنیک</option>
+              <option value="بیوسنتز">بیوسنتز</option>
+              <option value="PKU">PKU</option>
+              <option value="اختلالات کلیوی">اختلالات کلیوی</option>
+              <option value="هیستیدین">هیستیدین</option>
+              <option value="BCAA">BCAA</option>
+              <option value="نقص آنزیمی">نقص آنزیمی</option>
+            </select>
+        </div>
+        <div class="form-group">
+          <label for="quizDiff">سطح دشواری:</label>
+          <select id="quizDiff">
+            <option value="all">همه سطوح</option>
+            <option value="آسان">آسان</option>
+            <option value="متوسط">متوسط</option>
+            <option value="دشوار">دشوار</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="quizCount">تعداد سؤالات:</label>
+          <input type="number" id="quizCount" value="5" min="1" max="20">
+        </div>
+        <button class="btn" id="btnStartQuiz" style="width: 100%; margin-top: 0.5rem;">شروع آزمون</button>
+      </div>
+
+      <!-- Quiz Active Area -->
+      <div id="quizActiveArea" style="display: none; max-width: 700px; margin: 0 auto;">
+        <div class="card" style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1.25rem;">
+          <span id="quizQuestionTracker" style="font-weight: bold; color: var(--text-muted);">سؤال ۱ از ۵</span>
+          <button class="btn-icon" id="btnBookmarkQuiz" title="نشان‌کردن سؤال">🔖 <span id="bookmarkLabel">نشان کردن</span></button>
+        </div>
+
+        <div class="card" id="quizQuestionCard">
+          <div id="quizQuestionHeader" style="margin-bottom: 1rem;">
+            <span id="quizBadgeTopic" style="background: var(--primary-light); color: var(--primary); padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.8rem; margin-left: 0.5rem;">مبحث</span>
+            <span id="quizBadgeDiff" style="background: var(--border-color); color: var(--text-muted); padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.8rem;">سطح</span>
+          </div>
+          <h3 id="quizQuestionPrompt" style="margin-bottom: 1.25rem; font-size: 1.1rem; line-height: 1.5;">صورت سؤال اینجا قرار می‌گیرد</h3>
+
+          <div id="quizInteractiveContainer"></div>
+
+          <div id="quizExplanationBox" class="explanation-box" style="display: none;"></div>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; gap: 1rem;">
+          <button class="btn btn-outline" id="btnQuizPrev">سؤال قبلی</button>
+          <button class="btn" id="btnQuizNext">سؤال بعدی</button>
+        </div>
+      </div>
+
+      <!-- Quiz Result Summary -->
+      <div id="quizResultPanel" class="card" style="display: none; max-width: 650px; margin: 0 auto; text-align: center;">
+        <h2 style="color: var(--primary); margin-bottom: 0.5rem;">کارنامه آزمون</h2>
+        <p style="font-size: 1.25rem; margin-bottom: 1.5rem;">درصد کل شما: <span id="quizFinalScore" style="font-weight: bold; color: var(--accent);">۰%</span></p>
+
+        <div style="text-align: right; margin-bottom: 1.5rem;">
+          <h3>مرور اشتباهات:</h3>
+          <div id="quizMistakesList" style="margin-top: 0.75rem; font-size: 0.9rem;"></div>
+        </div>
+
+        <button class="btn" id="btnRestartQuiz">آزمون مجدد</button>
+      </div>
+    </section>
+
+    <!-- TAB 4: ANALYTICS -->
+    <section id="tab-analytics" class="tab-content">
+      <div class="card">
+        <h2>تحلیل عملکرد و پیشرفت</h2>
+        <p style="color: var(--text-muted); margin-bottom: 1.5rem;">آمار پاسخ‌دهی به سؤالات آزمون در حافظه مرورگر</p>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+          <div class="card" style="text-align: center; border-color: var(--primary-light);">
+            <div style="font-size: 0.85rem; color: var(--text-muted);">کل سؤالات پاسخ‌داده‌شده</div>
+            <div id="statTotalAnswered" style="font-size: 1.75rem; font-weight: bold; color: var(--primary); margin-top: 0.25rem;">۰</div>
+          </div>
+          <div class="card" style="text-align: center; border-color: var(--primary-light);">
+            <div style="font-size: 0.85rem; color: var(--text-muted);">درصد کل موفقیت</div>
+            <div id="statOverallAccuracy" style="font-size: 1.75rem; font-weight: bold; color: var(--accent); margin-top: 0.25rem;">۰%</div>
+          </div>
+        </div>
+
+        <h3 style="margin-bottom: 0.75rem;">عملکرد به تفکیک مبحث</h3>
+        <div id="topicChartContainer" class="bar-chart-container"></div>
+
+        <h3 style="margin: 1.5rem 0 0.75rem 0;">عملکرد به تفکیک سطح دشواری</h3>
+        <div id="diffChartContainer" class="bar-chart-container"></div>
+
+        <h3 style="margin: 1.5rem 0 0.75rem 0;">سؤالات با پاسخ غلط اخیر</h3>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>سؤال</th>
+                <th>پاسخ شما</th>
+                <th>پاسخ صحیح</th>
+              </tr>
+            </thead>
+            <tbody id="mistakesTableBody">
+              <tr>
+                <td colspan="3" style="text-align: center; color: var(--text-muted);">هیچ سابقه خطایی ثبت نشده است.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div style="margin-top: 2rem; border-top: 1px solid var(--border-color); padding-top: 1rem; text-align: left;">
+          <button class="btn btn-danger" id="btnResetAnalytics">بازنشانی کامل پیشرفت</button>
+        </div>
+      </div>
+    </section>
   </main>
 
-  <noscript>برای استفاده از بخش‌های تعاملی این صفحه، JavaScript را فعال کنید.</noscript>
-  <script src="src/scripts/theme.js"></script>
-  <script src="src/scripts/navigation.js"></script>
-  <script src="src/scripts/flashcard.js"></script>
-  <script src="src/scripts/quiz.js"></script>
-  <script src="src/scripts/result.js"></script>
-  <script src="src/scripts/progress.js"></script>
-  <script src="src/scripts/app.js"></script>
+  <footer style="width:min(var(--content-width),calc(100% - 28px));margin:0 auto 30px;text-align:center;color:var(--text-3);font-size:.72rem;">
+    HTML Study Note Blueprint · reusable educational UI system
+  </footer>
+
+
+  <div style="width:min(var(--content-width),calc(100% - 28px));margin:0 auto 20px;padding:10px 14px;border:1px solid var(--border);border-radius:12px;background:var(--surface);color:var(--text-2);font-size:.76rem;text-align:center;">
+    مبنا: PDF «متابولیسم پروتئین — جلسه ۵» · محتوای آموزشی، فلش‌کارت‌ها و سؤالات این فایل از همان منبع ساخته شده‌اند.
+  </div>
+
+  <!-- SETTINGS MODAL -->
+  <div class="modal-overlay" id="settingsModal">
+    <div class="modal-card">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+        <h3 style="color: var(--primary);">تنظیمات و پشتیبان‌گیری</h3>
+        <button class="btn-icon" id="btnCloseSettingsModal" style="border: none; font-size: 1.1rem;">✕</button>
+      </div>
+
+      <div class="form-group">
+        <label for="themeSelect">پوسته (تم):</label>
+        <select id="themeSelect">
+          <option value="light">روشن</option>
+          <option value="dark">تیره</option>
+          <option value="sepia">سپیا (کتابی)</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="fontSizeSelect">اندازه فونت متن:</label>
+        <select id="fontSizeSelect">
+          <option value="small">کوچک</option>
+          <option value="medium">متوسط</option>
+          <option value="large">بزرگ</option>
+        </select>
+      </div>
+
+      <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 1.25rem 0;">
+
+      <div class="form-group">
+        <label>پشتیبان‌گیری داده‌ها (JSON):</label>
+        <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
+          <button class="btn btn-outline" id="btnExportJSON" style="flex: 1;">صدور پشتیبان JSON</button>
+          <label class="btn btn-outline" style="flex: 1; text-align: center; cursor: pointer;">
+            بازخوانی فایل
+            <input type="file" id="importFileInput" accept=".json" style="display: none;">
+          </label>
+        </div>
+      </div>
+
+      <div style="margin-top: 1.5rem; text-align: left;">
+        <button class="btn" id="btnSaveSettings">بستن</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // --- Safe Storage Helper (localStorage with memory fallback) ---
+    window.__memoryStore = window.__memoryStore || {};
+    const Storage = {
+      getItem: function(key) {
+        try {
+          return window.localStorage.getItem(key);
+        } catch (e) {
+          return window.__memoryStore[key] || null;
+        }
+      },
+      setItem: function(key, val) {
+        try {
+          window.localStorage.setItem(key, val);
+        } catch (e) {
+          window.__memoryStore[key] = String(val);
+        }
+      },
+      removeItem: function(key) {
+        try {
+          window.localStorage.removeItem(key);
+        } catch (e) {
+          delete window.__memoryStore[key];
+        }
+      }
+    };
+
+    // --- Content Bank Placeholder ---
+    const flashcardsData = [
+  {
+    "id": "fc_1",
+    "topic": "اسکلت کربنی",
+    "front": "پس از حذف عامل آمین، اسکلت کربنی آمینواسیدها معمولاً وارد کدام شاهراه متابولیک می‌شود؟",
+    "back": "سیکل کربس."
+  },
+  {
+    "id": "fc_2",
+    "topic": "اسکلت کربنی",
+    "front": "در جزوه، محصولات احیایی مهم سیکل کربس که از طریق زنجیره تنفسی به ATP مربوط می‌شوند کدام‌اند؟",
+    "back": "NADH و FADH."
+  },
+  {
+    "id": "fc_3",
+    "topic": "کتوژنیک/گلوکوژنیک",
+    "front": "آمینواسیدهای صرفاً کتوژنیک کدام‌اند؟",
+    "back": "لوسین و لایزین."
+  },
+  {
+    "id": "fc_4",
+    "topic": "کتوژنیک/گلوکوژنیک",
+    "front": "چهار آمینواسید هم کتوژنیک و هم گلوکوژنیک کدام‌اند؟",
+    "back": "ایزولوسین، فنیل‌آلانین، تریپتوفان و تیروزین."
+  },
+  {
+    "id": "fc_5",
+    "topic": "کتوژنیک/گلوکوژنیک",
+    "front": "طبق جزوه، آمینواسیدهای کتوژنیک می‌توانند چه محصولات کربنی‌ای بسازند؟",
+    "back": "پیرووات، استیل‌کوآنزیم A و استواستیل‌کوآنزیم A."
+  },
+  {
+    "id": "fc_6",
+    "topic": "کتوژنیک/گلوکوژنیک",
+    "front": "آمینواسیدهای گلوکوژنیک از چه جایگاه‌هایی می‌توانند به سیکل کربس برسند؟",
+    "back": "پیرووات، آلفاکتوگلوتارات، سوکسینیل‌کوآنزیم A، فومارات و اگزالواستات."
+  },
+  {
+    "id": "fc_7",
+    "topic": "اسکلت کربنی",
+    "front": "آسپارژین و آسپارتیک اسید طبق جزوه از طریق کدام ترکیب به سیکل کربس می‌رسند؟",
+    "back": "اگزالواستات."
+  },
+  {
+    "id": "fc_8",
+    "topic": "اسکلت کربنی",
+    "front": "جزوه سیکل کربس را با چه تعبیر مفهومی معرفی می‌کند؟",
+    "back": "شاهراه متابولیک."
+  },
+  {
+    "id": "fc_9",
+    "topic": "بیوسنتز",
+    "front": "آمینواسیدهای ضروری چگونه تعریف شده‌اند؟",
+    "back": "در شرایط نرمال باید از مواد غذایی دریافت شوند."
+  },
+  {
+    "id": "fc_10",
+    "topic": "بیوسنتز",
+    "front": "آمینواسیدهای غیرضروری چگونه تعریف شده‌اند؟",
+    "back": "در بدن با کمک واکنش‌های متابولیک ساخته می‌شوند."
+  },
+  {
+    "id": "fc_11",
+    "topic": "بیوسنتز",
+    "front": "طبق جزوه برای ساخت مجموعهٔ آمینواسیدهای غیرضروری چند آنزیم ذکر شده است؟",
+    "back": "۱۷ آنزیم."
+  },
+  {
+    "id": "fc_12",
+    "topic": "بیوسنتز",
+    "front": "طبق جزوه برای ساخت آمینواسیدهای ضروری چند آنزیم ذکر شده است؟",
+    "back": "۵۹ آنزیم."
+  },
+  {
+    "id": "fc_13",
+    "topic": "بیوسنتز",
+    "front": "آلفاکتوگلوتارات با دریافت عامل آمین به چه آمینواسیدی تبدیل می‌شود؟",
+    "back": "گلوتامیک اسید."
+  },
+  {
+    "id": "fc_14",
+    "topic": "بیوسنتز",
+    "front": "آنزیم ذکرشده برای تبدیل آلفاکتوگلوتارات به گلوتامیک اسید چیست؟",
+    "back": "گلوتامات دهیدروژناز."
+  },
+  {
+    "id": "fc_15",
+    "topic": "بیوسنتز",
+    "front": "گلوتامیک اسید با دریافت آمونیاک و به کمک کدام آنزیم به گلوتامین تبدیل می‌شود؟",
+    "back": "گلوتامین سنتاز."
+  },
+  {
+    "id": "fc_16",
+    "topic": "بیوسنتز",
+    "front": "آسپارتیک اسید با دریافت عامل آمین به چه ترکیبی تبدیل می‌شود؟",
+    "back": "آسپاراژین."
+  },
+  {
+    "id": "fc_17",
+    "topic": "بیوسنتز",
+    "front": "آنزیم ساخت آسپاراژین طبق جزوه چیست؟",
+    "back": "آسپاراژین سنتاز."
+  },
+  {
+    "id": "fc_18",
+    "topic": "بیوسنتز",
+    "front": "افزودن عامل آمین به پیرووات چه محصولی می‌دهد؟",
+    "back": "آلانین."
+  },
+  {
+    "id": "fc_19",
+    "topic": "بیوسنتز",
+    "front": "سرین از کدام ترکیب مسیر گلیکولیز ساخته می‌شود؟",
+    "back": "فسفوگلیسرات."
+  },
+  {
+    "id": "fc_20",
+    "topic": "بیوسنتز",
+    "front": "سرین می‌تواند به چه دو آمینواسید مهمی در ادامهٔ مسیر تبدیل شود؟",
+    "back": "گلایسین و سیستئین."
+  },
+  {
+    "id": "fc_21",
+    "topic": "بیوسنتز",
+    "front": "سیستاتیونین توسط کدام آنزیم ساخته می‌شود؟",
+    "back": "سیستاتیونین سنتاز."
+  },
+  {
+    "id": "fc_22",
+    "topic": "بیوسنتز",
+    "front": "سیستاتیونین توسط کدام آنزیم شکسته می‌شود؟",
+    "back": "سیستاتیوناز."
+  },
+  {
+    "id": "fc_23",
+    "topic": "بیوسنتز",
+    "front": "پرولین طبق جزوه از کدام آمینواسید و طی چند واکنش ساخته می‌شود؟",
+    "back": "از گلوتامیک اسید و طی ۳ واکنش."
+  },
+  {
+    "id": "fc_24",
+    "topic": "PKU",
+    "front": "آنزیم تبدیل فنیل‌آلانین به تیروزین چیست؟",
+    "back": "فنیل‌آلانین هیدروکسیلاز."
+  },
+  {
+    "id": "fc_25",
+    "topic": "PKU",
+    "front": "کوآنزیم فنیل‌آلانین هیدروکسیلاز در جزوه چیست؟",
+    "back": "تتراهیدروبیوپترین."
+  },
+  {
+    "id": "fc_26",
+    "topic": "PKU",
+    "front": "تتراهیدروبیوپترین پس از واکنش به چه فرم اکسیدشده‌ای تبدیل می‌شود؟",
+    "back": "دی‌هیدروبیوپترین."
+  },
+  {
+    "id": "fc_27",
+    "topic": "PKU",
+    "front": "برای بازسازی تتراهیدروبیوپترین کدام آنزیم مطرح شده است؟",
+    "back": "دی‌هیدروبیوپترین ردوکتاز."
+  },
+  {
+    "id": "fc_28",
+    "topic": "PKU",
+    "front": "کوآنزیم دی‌هیدروبیوپترین ردوکتاز چیست؟",
+    "back": "NADPH."
+  },
+  {
+    "id": "fc_29",
+    "topic": "PKU",
+    "front": "نقص مسیر فنیل‌آلانین به تیروزین با چه نام‌هایی مطرح شده است؟",
+    "back": "PKU یا hyperphenylalaninemia."
+  },
+  {
+    "id": "fc_30",
+    "topic": "PKU",
+    "front": "در PKU اگر فنیل‌آلانین به تیروزین تبدیل نشود چه اتفاقی برای فنیل‌آلانین رخ می‌دهد؟",
+    "back": "افزایش می‌یابد و می‌تواند وارد مسیرهای فرعی شود."
+  },
+  {
+    "id": "fc_31",
+    "topic": "PKU",
+    "front": "در Type I PKU چه آنزیمی دچار نقص است؟",
+    "back": "فنیل‌آلانین هیدروکسیلاز."
+  },
+  {
+    "id": "fc_32",
+    "topic": "PKU",
+    "front": "در Type II و III PKU طبق جزوه چه آنزیمی دچار نقص است؟",
+    "back": "دی‌هیدروبیوپترین ردوکتاز."
+  },
+  {
+    "id": "fc_33",
+    "topic": "PKU",
+    "front": "Type IV و V PKU در جزوه به چه نقصی نسبت داده شده‌اند؟",
+    "back": "نقص در بیوسنتز دی‌هیدروبیوپترین."
+  },
+  {
+    "id": "fc_34",
+    "topic": "اختلالات",
+    "front": "در شرایط نرمال آمینواسیدها چرا از طریق ادرار دفع نمی‌شوند؟",
+    "back": "به دلیل بازجذب کلیوی آن‌ها."
+  },
+  {
+    "id": "fc_35",
+    "topic": "اختلالات",
+    "front": "Glycinuria به چه اختلالی نسبت داده شده است؟",
+    "back": "اختلال در بازجذب توبولی گلایسین."
+  },
+  {
+    "id": "fc_36",
+    "topic": "اختلالات",
+    "front": "Cystinuria کدام گروه از آمینواسیدها را درگیر می‌کند؟",
+    "back": "سیستئین، لایزین، آرژینین و اورنیتین."
+  },
+  {
+    "id": "fc_37",
+    "topic": "اختلالات",
+    "front": "چرا در cystinuria سنگ تشکیل می‌شود؟",
+    "back": "به علت نامحلول بودن سیستئین در آب."
+  },
+  {
+    "id": "fc_38",
+    "topic": "اختلالات",
+    "front": "Cystinosis چه نوع نقص سلولی را مطرح می‌کند؟",
+    "back": "نقص لیزوزومی و تجمع کریستال‌های نامحلول سیستئین."
+  },
+  {
+    "id": "fc_39",
+    "topic": "هیستیدین",
+    "front": "اولین آنزیم کاتابولیسم هیستیدین چیست؟",
+    "back": "هیستیداز."
+  },
+  {
+    "id": "fc_40",
+    "topic": "هیستیدین",
+    "front": "محصول مرحلهٔ اول کاتابولیسم هیستیدین چیست؟",
+    "back": "اوراکانات یا urocanic acid."
+  },
+  {
+    "id": "fc_41",
+    "topic": "هیستیدین",
+    "front": "آنزیم مرحلهٔ دوم کاتابولیسم هیستیدین چیست؟",
+    "back": "اوراکاناز."
+  },
+  {
+    "id": "fc_42",
+    "topic": "هیستیدین",
+    "front": "حاصل نهایی کاتابولیسم هیستیدین در جزوه چیست؟",
+    "back": "گلوتامیک اسید / گلوتامات."
+  },
+  {
+    "id": "fc_43",
+    "topic": "BCAA",
+    "front": "سه آمینواسید شاخه‌دار کدام‌اند؟",
+    "back": "والین، لوسین و ایزولوسین."
+  },
+  {
+    "id": "fc_44",
+    "topic": "BCAA",
+    "front": "کاتابولیسم اولیهٔ BCAAها چه ویژگی مشترکی دارد؟",
+    "back": "مسیرهای اولیه برای هر سه مشابه است و یک کمپلکس آنزیمی مشترک مطرح شده است."
+  },
+  {
+    "id": "fc_45",
+    "topic": "BCAA",
+    "front": "نام بیماری ناشی از نقص متابولیسم BCAAها در جزوه چیست؟",
+    "back": "Maple Syrup Urine Disease."
+  },
+  {
+    "id": "fc_46",
+    "topic": "BCAA",
+    "front": "ویژگی بویایی معروف MSUD چیست؟",
+    "back": "بوی شیرهٔ درخت افرا یا شکر سوخته در ادرار."
+  },
+  {
+    "id": "fc_47",
+    "topic": "BCAA",
+    "front": "در MSUD چه موادی افزایش می‌یابند؟",
+    "back": "لوسین، والین، ایزولوسین و آلفاکتو اسیدها."
+  },
+  {
+    "id": "fc_48",
+    "topic": "BCAA",
+    "front": "جزوه بر تشخیص MSUD در چه زمانی تأکید دارد؟",
+    "back": "خیلی زود، همان هفتهٔ اول تولد."
+  },
+  {
+    "id": "fc_49",
+    "topic": "نقص آنزیمی",
+    "front": "جهش در آنزیم چگونه می‌تواند باعث بیماری شود؟",
+    "back": "با مختل کردن اتصال سوبسترا به جایگاه فعال و کاهش تولید محصول."
+  },
+  {
+    "id": "fc_50",
+    "topic": "نقص آنزیمی",
+    "front": "شدت بیماری ناشی از نقص آنزیمی به چه چیزی وابسته است؟",
+    "back": "به میزان کاهش فعالیت آنزیم."
+  }
+];
+
+    const questionsData = [
+  {
+    "id": "q1",
+    "type": "mcq",
+    "topic": "کتوژنیک/گلوکوژنیک",
+    "difficulty": "آسان",
+    "question": "کدام آمینواسید در جزوه صرفاً کتوژنیک معرفی شده است؟",
+    "options": [
+      "ایزولوسین",
+      "لوسین",
+      "تیروزین",
+      "فنیل‌آلانین"
+    ],
+    "answer": 1,
+    "explanation": "لوسین و لایزین در جزوه صرفاً کتوژنیک معرفی شده‌اند."
+  },
+  {
+    "id": "q2",
+    "type": "mcq",
+    "topic": "کتوژنیک/گلوکوژنیک",
+    "difficulty": "آسان",
+    "question": "کدام مجموعه شامل هر چهار آمینواسید هم کتوژنیک و هم گلوکوژنیک است؟",
+    "options": [
+      "لوسین، لایزین، والین، آلانین",
+      "ایزولوسین، فنیل‌آلانین، تریپتوفان، تیروزین",
+      "گلوتامین، گلایسین، سرین، سیستئین",
+      "والین، لوسین، ایزولوسین، لایزین"
+    ],
+    "answer": 1,
+    "explanation": "این چهار مورد دقیقاً در متن جزوه ذکر شده‌اند."
+  },
+  {
+    "id": "q3",
+    "type": "mcq",
+    "topic": "اسکلت کربنی",
+    "difficulty": "متوسط",
+    "question": "آسپارژین و آسپارتیک اسید طبق جزوه از طریق کدام ترکیب به سیکل کربس می‌رسند؟",
+    "options": [
+      "استیل-CoA",
+      "سوکسینیل-CoA",
+      "اگزالواستات",
+      "فومارات"
+    ],
+    "answer": 2,
+    "explanation": "در متن جزوه برای آسپارژین و آسپارتیک اسید، اگزالواستات به‌عنوان مسیر ورود ذکر شده است."
+  },
+  {
+    "id": "q4",
+    "type": "truefalse",
+    "topic": "اسکلت کربنی",
+    "difficulty": "آسان",
+    "question": "سیکل کربس در جزوه به‌عنوان یک شاهراه متابولیک توصیف شده است.",
+    "answer": true,
+    "explanation": "این تعبیر صریحاً در متن آمده است."
+  },
+  {
+    "id": "q5",
+    "type": "mcq",
+    "topic": "بیوسنتز",
+    "difficulty": "آسان",
+    "question": "آنزیم تبدیل آلفاکتوگلوتارات به گلوتامیک اسید کدام است؟",
+    "options": [
+      "گلوتامین سنتاز",
+      "گلوتامات دهیدروژناز",
+      "آسپاراژین سنتاز",
+      "سیستاتیوناز"
+    ],
+    "answer": 1,
+    "explanation": "جزوه این واکنش را با گلوتامات دهیدروژناز معرفی می‌کند."
+  },
+  {
+    "id": "q6",
+    "type": "mcq",
+    "topic": "بیوسنتز",
+    "difficulty": "متوسط",
+    "question": "گلوتامیک اسید با دریافت آمونیاک به کمک کدام آنزیم به گلوتامین تبدیل می‌شود؟",
+    "options": [
+      "گلوتامات دهیدروژناز",
+      "فنیل‌آلانین هیدروکسیلاز",
+      "گلوتامین سنتاز",
+      "اوراکاناز"
+    ],
+    "answer": 2,
+    "explanation": "گلوتامین سنتاز در جزوه برای این تبدیل ذکر شده است."
+  },
+  {
+    "id": "q7",
+    "type": "mcq",
+    "topic": "بیوسنتز",
+    "difficulty": "آسان",
+    "question": "افزودن عامل آمین به پیرووات چه محصولی ایجاد می‌کند؟",
+    "options": [
+      "آلانین",
+      "آسپارتات",
+      "گلوتامین",
+      "سرین"
+    ],
+    "answer": 0,
+    "explanation": "در متن جزوه پیرووات + عامل آمین → آلانین آمده است."
+  },
+  {
+    "id": "q8",
+    "type": "truefalse",
+    "topic": "بیوسنتز",
+    "difficulty": "آسان",
+    "question": "سرین در جزوه از فسفوگلیسرات ساخته می‌شود.",
+    "answer": true,
+    "explanation": "فسفوگلیسرات به‌عنوان پیش‌ساز سرین معرفی شده است."
+  },
+  {
+    "id": "q9",
+    "type": "mcq",
+    "topic": "بیوسنتز",
+    "difficulty": "متوسط",
+    "question": "کدام آنزیم سیستاتیونین را از سرین و هموسیستئین می‌سازد؟",
+    "options": [
+      "سیستاتیونین سنتاز",
+      "سیستاتیوناز",
+      "آسپاراژین سنتاز",
+      "هیستیداز"
+    ],
+    "answer": 0,
+    "explanation": "در جزوه، سیستاتیونین سنتاز مسئول ساخت سیستاتیونین معرفی شده است."
+  },
+  {
+    "id": "q10",
+    "type": "mcq",
+    "topic": "PKU",
+    "difficulty": "آسان",
+    "question": "آنزیم تبدیل فنیل‌آلانین به تیروزین کدام است؟",
+    "options": [
+      "دی‌هیدروبیوپترین ردوکتاز",
+      "فنیل‌آلانین هیدروکسیلاز",
+      "هیستیداز",
+      "گلوتامات دهیدروژناز"
+    ],
+    "answer": 1,
+    "explanation": "واکنش اصلی با phenylalanine hydroxylase انجام می‌شود."
+  },
+  {
+    "id": "q11",
+    "type": "mcq",
+    "topic": "PKU",
+    "difficulty": "آسان",
+    "question": "کوآنزیم اصلی فنیل‌آلانین هیدروکسیلاز طبق جزوه چیست؟",
+    "options": [
+      "NADPH",
+      "تتراهیدروبیوپترین",
+      "ویتامین C",
+      "آهن"
+    ],
+    "answer": 1,
+    "explanation": "جزوه تتراهیدروبیوپترین را برای این واکنش ذکر می‌کند."
+  },
+  {
+    "id": "q12",
+    "type": "mcq",
+    "topic": "PKU",
+    "difficulty": "متوسط",
+    "question": "برای بازسازی تتراهیدروبیوپترین کدام ترکیب و آنزیم لازم‌اند؟",
+    "options": [
+      "NADPH + دی‌هیدروبیوپترین ردوکتاز",
+      "ATP + گلوتامین سنتاز",
+      "ویتامین C + هیدروکسیلاز",
+      "FADH + هیستیداز"
+    ],
+    "answer": 0,
+    "explanation": "دی‌هیدروبیوپترین ردوکتاز با NADPH فرم تترا را بازسازی می‌کند."
+  },
+  {
+    "id": "q13",
+    "type": "truefalse",
+    "topic": "PKU",
+    "difficulty": "آسان",
+    "question": "در Type I PKU نقص در فنیل‌آلانین هیدروکسیلاز است.",
+    "answer": true,
+    "explanation": "این ویژگی در صفحهٔ انواع PKU ذکر شده است."
+  },
+  {
+    "id": "q14",
+    "type": "mcq",
+    "topic": "PKU",
+    "difficulty": "دشوار",
+    "question": "Type II و III PKU در جزوه به نقص کدام آنزیم نسبت داده شده‌اند؟",
+    "options": [
+      "فنیل‌آلانین هیدروکسیلاز",
+      "دی‌هیدروبیوپترین ردوکتاز",
+      "هیستیداز",
+      "سیستاتیونین سنتاز"
+    ],
+    "answer": 1,
+    "explanation": "در متن Type II و III با نقص dihydrobiopterin reductase آمده‌اند."
+  },
+  {
+    "id": "q15",
+    "type": "mcq",
+    "topic": "PKU",
+    "difficulty": "متوسط",
+    "question": "اگر Type I PKU وجود داشته باشد، طبق جزوه کدام رویکرد غذایی مطرح است؟",
+    "options": [
+      "افزایش فنیل‌آلانین و کاهش تیروزین",
+      "حذف فنیل‌آلانین و اضافه کردن تیروزین",
+      "حذف تیروزین و اضافه کردن فنیل‌آلانین",
+      "فقط اضافه کردن NADPH"
+    ],
+    "answer": 1,
+    "explanation": "جزوه حذف فنیل‌آلانین غذایی و افزودن تیروزین را مطرح می‌کند."
+  },
+  {
+    "id": "q16",
+    "type": "mcq",
+    "topic": "اختلالات کلیوی",
+    "difficulty": "آسان",
+    "question": "در شرایط نرمال، چرا آمینواسیدها در ادرار دیده نمی‌شوند؟",
+    "options": [
+      "تولید نمی‌شوند",
+      "کلیه آن‌ها را بازجذب می‌کند",
+      "همه در کبد تخریب می‌شوند",
+      "از ریه دفع می‌شوند"
+    ],
+    "answer": 1,
+    "explanation": "بازجذب توبولی عامل اصلی ذکرشده در جزوه است."
+  },
+  {
+    "id": "q17",
+    "type": "mcq",
+    "topic": "اختلالات کلیوی",
+    "difficulty": "متوسط",
+    "question": "Glycinuria در جزوه بیشتر به کدام مشکل مربوط شده است؟",
+    "options": [
+      "اختلال در سنتز گلایسین",
+      "اختلال بازجذب توبولی گلایسین",
+      "نقص هیستیداز",
+      "نقص فنیل‌آلانین هیدروکسیلاز"
+    ],
+    "answer": 1,
+    "explanation": "در glycinuria بازجذب گلایسین در توبول‌های کلیوی مختل می‌شود."
+  },
+  {
+    "id": "q18",
+    "type": "truefalse",
+    "topic": "اختلالات کلیوی",
+    "difficulty": "متوسط",
+    "question": "در cystinuria فقط سیستئین دفع می‌شود و آمینواسیدهای دیگری درگیر نیستند.",
+    "answer": false,
+    "explanation": "سیستئین همراه با لایزین، آرژینین و اورنیتین در متن مطرح شده است."
+  },
+  {
+    "id": "q19",
+    "type": "mcq",
+    "topic": "اختلالات کلیوی",
+    "difficulty": "متوسط",
+    "question": "علت تشکیل سنگ در cystinuria طبق جزوه چیست؟",
+    "options": [
+      "محلول‌پذیری بالای سیستئین",
+      "نامحلول بودن سیستئین در آب",
+      "افزایش فنیل‌آلانین",
+      "کاهش گلوتامات"
+    ],
+    "answer": 1,
+    "explanation": "نامحلول بودن سیستئین در آب علت تشکیل سنگ‌های سیستئینی ذکر شده است."
+  },
+  {
+    "id": "q20",
+    "type": "mcq",
+    "topic": "اختلالات کلیوی",
+    "difficulty": "دشوار",
+    "question": "Cystinosis در جزوه با کدام فرآیند مرتبط است؟",
+    "options": [
+      "نقص لیزوزومی و تجمع کریستال‌های سیستئین",
+      "افزایش ساخت اوره",
+      "نقص ترانس‌آمیناسیون پیرووات",
+      "افزایش ساخت تیروزین"
+    ],
+    "answer": 0,
+    "explanation": "نقص لیزوزومی و تجمع کریستال‌های نامحلول سیستئین در متن آمده است."
+  },
+  {
+    "id": "q21",
+    "type": "mcq",
+    "topic": "هیستیدین",
+    "difficulty": "آسان",
+    "question": "اولین آنزیم کاتابولیسم هیستیدین کدام است؟",
+    "options": [
+      "اوراکاناز",
+      "هیستیداز",
+      "دی‌هیدروبیوپترین ردوکتاز",
+      "گلوتامات دهیدروژناز"
+    ],
+    "answer": 1,
+    "explanation": "هیستیداز به‌عنوان آنزیم اول معرفی شده است."
+  },
+  {
+    "id": "q22",
+    "type": "mcq",
+    "topic": "هیستیدین",
+    "difficulty": "متوسط",
+    "question": "محصول مستقیم هیستیداز در جزوه چیست؟",
+    "options": [
+      "گلوتامات",
+      "اوراکانات",
+      "ایمیدازول پیرووات",
+      "تیروزین"
+    ],
+    "answer": 1,
+    "explanation": "هیستیداز، هیستیدین را به اوراکانات تبدیل می‌کند."
+  },
+  {
+    "id": "q23",
+    "type": "mcq",
+    "topic": "هیستیدین",
+    "difficulty": "متوسط",
+    "question": "نقص اوراکاناز با کدام اختلال در متن مرتبط است؟",
+    "options": [
+      "Histidinemia",
+      "Urocanic aciduria",
+      "Cystinuria",
+      "MSUD"
+    ],
+    "answer": 1,
+    "explanation": "نقص اوراکاناز در بخش urocanic aciduria مطرح شده است."
+  },
+  {
+    "id": "q24",
+    "type": "mcq",
+    "topic": "هیستیدین",
+    "difficulty": "آسان",
+    "question": "حاصل نهایی کاتابولیسم هیستیدین در جزوه چیست؟",
+    "options": [
+      "آلانین",
+      "گلوتامات",
+      "تیروزین",
+      "اگزالواستات"
+    ],
+    "answer": 1,
+    "explanation": "متن جزوه حاصل نهایی را گلوتامیک اسید / گلوتامات بیان می‌کند."
+  },
+  {
+    "id": "q25",
+    "type": "mcq",
+    "topic": "BCAA",
+    "difficulty": "آسان",
+    "question": "کدام مجموعه سه آمینواسید شاخه‌دار را تشکیل می‌دهد؟",
+    "options": [
+      "والین، لوسین، ایزولوسین",
+      "لوسین، لایزین، تیروزین",
+      "آلانین، گلایسین، سرین",
+      "فنیل‌آلانین، تیروزین، تریپتوفان"
+    ],
+    "answer": 0,
+    "explanation": "BCAAها در جزوه والین، لوسین و ایزولوسین هستند."
+  },
+  {
+    "id": "q26",
+    "type": "truefalse",
+    "topic": "BCAA",
+    "difficulty": "متوسط",
+    "question": "مسیرهای اولیهٔ کاتابولیسم هر سه BCAA در جزوه مشترک معرفی شده‌اند.",
+    "answer": true,
+    "explanation": "متن بر مسیرهای مشترک و یک کمپلکس آنزیمی مشترک تأکید دارد."
+  },
+  {
+    "id": "q27",
+    "type": "mcq",
+    "topic": "BCAA",
+    "difficulty": "آسان",
+    "question": "نام بیماری مرتبط با نقص متابولیسم BCAAها در جزوه چیست؟",
+    "options": [
+      "PKU",
+      "Maple Syrup Urine Disease",
+      "Histidinemia",
+      "Glycinuria"
+    ],
+    "answer": 1,
+    "explanation": "این بیماری به‌عنوان Maple Syrup urine disease معرفی شده است."
+  },
+  {
+    "id": "q28",
+    "type": "mcq",
+    "topic": "BCAA",
+    "difficulty": "آسان",
+    "question": "ویژگی کلاسیک MSUD در متن چیست؟",
+    "options": [
+      "بوی ماهی در ادرار",
+      "بوی شیرهٔ درخت افرا یا شکر سوخته",
+      "بی‌رنگ شدن ادرار",
+      "تشکیل مستقیم اوره"
+    ],
+    "answer": 1,
+    "explanation": "نام بیماری از بوی ادرار گرفته شده است."
+  },
+  {
+    "id": "q29",
+    "type": "mcq",
+    "topic": "BCAA",
+    "difficulty": "دشوار",
+    "question": "در MSUD طبق جزوه کدام موارد افزایش می‌یابند؟",
+    "options": [
+      "فقط تیروزین",
+      "لوسین، والین، ایزولوسین و آلفاکتو اسیدها",
+      "فقط گلوتامات",
+      "فقط فنیل‌آلانین"
+    ],
+    "answer": 1,
+    "explanation": "این چهار گروه در متن افزایش‌یافته ذکر شده‌اند."
+  },
+  {
+    "id": "q30",
+    "type": "mcq",
+    "topic": "BCAA",
+    "difficulty": "متوسط",
+    "question": "جزوه بر شناسایی MSUD در چه زمانی تأکید دارد؟",
+    "options": [
+      "پس از بلوغ",
+      "در هفتهٔ اول تولد",
+      "در پایان نوجوانی",
+      "فقط بعد از بروز آسیب مغزی"
+    ],
+    "answer": 1,
+    "explanation": "تشخیص در همان هفتهٔ اول تولد برای جلوگیری از آسیب جبران‌ناپذیر مورد تأکید است."
+  },
+  {
+    "id": "q31",
+    "type": "mcq",
+    "topic": "نقص آنزیمی",
+    "difficulty": "متوسط",
+    "question": "اگر جهش باعث شود سوبسترا نتواند به جایگاه فعال آنزیم متصل شود، چه نتیجه‌ای محتمل است؟",
+    "options": [
+      "تولید محصول کاهش می‌یابد یا متوقف می‌شود",
+      "تولید محصول همیشه افزایش می‌یابد",
+      "هیچ اثری ندارد",
+      "فقط pH تغییر می‌کند"
+    ],
+    "answer": 0,
+    "explanation": "این رابطه مستقیم در متن توضیح داده شده است."
+  },
+  {
+    "id": "q32",
+    "type": "truefalse",
+    "topic": "نقص آنزیمی",
+    "difficulty": "آسان",
+    "question": "تمام نقص‌های آنزیمی در متن جزوه شدت یکسان دارند.",
+    "answer": false,
+    "explanation": "جزوه شدت نقص را از خفیف تا شدید دسته‌بندی می‌کند."
+  },
+  {
+    "id": "q33",
+    "type": "fillblank",
+    "topic": "کتوژنیک/گلوکوژنیک",
+    "difficulty": "آسان",
+    "question": "دو آمینواسید صرفاً کتوژنیک عبارت‌اند از .......... و ..........",
+    "acceptable": [
+      "لوسین و لایزین",
+      "leucine and lysine",
+      "لوسین، لایزین",
+      "leucine lysine"
+    ],
+    "explanation": "این دو در جزوه تنها آمینواسیدهای صرفاً کتوژنیک‌اند."
+  },
+  {
+    "id": "q34",
+    "type": "fillblank",
+    "topic": "PKU",
+    "difficulty": "آسان",
+    "question": "آنزیم تبدیل فنیل‌آلانین به تیروزین .......... نام دارد.",
+    "acceptable": [
+      "فنیل آلانین هیدروکسیلاز",
+      "فنیل‌آلانین هیدروکسیلاز",
+      "phenylalanine hydroxylase",
+      "PAH"
+    ],
+    "explanation": "این آنزیم مرحلهٔ هیدروکسیلاسیون فنیل‌آلانین را انجام می‌دهد."
+  },
+  {
+    "id": "q35",
+    "type": "fillblank",
+    "topic": "PKU",
+    "difficulty": "متوسط",
+    "question": "کوآنزیم مورد نیاز فنیل‌آلانین هیدروکسیلاز .......... است.",
+    "acceptable": [
+      "تتراهیدروبیوپترین",
+      "tetrahydrobiopterin",
+      "BH4"
+    ],
+    "explanation": "تتراهیدروبیوپترین در متن و اسلاید به‌عنوان کوآنزیم مطرح شده است."
+  },
+  {
+    "id": "q36",
+    "type": "fillblank",
+    "topic": "هیستیدین",
+    "difficulty": "آسان",
+    "question": "حاصل نهایی کاتابولیسم هیستیدین طبق جزوه .......... است.",
+    "acceptable": [
+      "گلوتامیک اسید",
+      "گلوتامات",
+      "glutamate",
+      "glutamic acid"
+    ],
+    "explanation": "متن پایان مسیر را به گلوتامیک اسید / گلوتامات نسبت می‌دهد."
+  },
+  {
+    "id": "q37",
+    "type": "fillblank",
+    "topic": "BCAA",
+    "difficulty": "آسان",
+    "question": "سه آمینواسید شاخه‌دار عبارت‌اند از ..........، .......... و ..........",
+    "acceptable": [
+      "والین لوسین ایزولوسین",
+      "valine leucine isoleucine",
+      "والین، لوسین، ایزولوسین"
+    ],
+    "explanation": "BCAAها در جزوه به این سه آمینواسید اطلاق شده‌اند."
+  },
+  {
+    "id": "q38",
+    "type": "matching",
+    "topic": "PKU",
+    "difficulty": "دشوار",
+    "question": "هر مورد را با جزء مرتبط در مسیر PKU جفت کنید:",
+    "pairs": [
+      {
+        "left": "Type I",
+        "right": "نقص فنیل‌آلانین هیدروکسیلاز"
+      },
+      {
+        "left": "Type II, III",
+        "right": "نقص دی‌هیدروبیوپترین ردوکتاز"
+      },
+      {
+        "left": "Type IV, V",
+        "right": "نقص بیوسنتز دی‌هیدروبیوپترین"
+      }
+    ],
+    "explanation": "این تطبیق مطابق دسته‌بندی درج‌شده در صفحات ۱۲ و ۱۳ جزوه است."
+  },
+  {
+    "id": "q39",
+    "type": "matching",
+    "topic": "بیوسنتز",
+    "difficulty": "متوسط",
+    "question": "هر آنزیم را با واکنش مربوط جفت کنید:",
+    "pairs": [
+      {
+        "left": "گلوتامات دهیدروژناز",
+        "right": "آلفاکتوگلوتارات → گلوتامیک اسید"
+      },
+      {
+        "left": "گلوتامین سنتاز",
+        "right": "گلوتامیک اسید + آمونیاک → گلوتامین"
+      },
+      {
+        "left": "آسپاراژین سنتاز",
+        "right": "آسپارتیک اسید → آسپاراژین"
+      }
+    ],
+    "explanation": "سه واکنش در بخش بیوسنتز آمینواسیدهای غیرضروری آمده‌اند."
+  },
+  {
+    "id": "q40",
+    "type": "matching",
+    "topic": "هیستیدین",
+    "difficulty": "متوسط",
+    "question": "آنزیم‌ها را با مرحلهٔ متناظر در مسیر هیستیدین جفت کنید:",
+    "pairs": [
+      {
+        "left": "هیستیداز",
+        "right": "هیستیدین → اوراکانات"
+      },
+      {
+        "left": "اوراکاناز",
+        "right": "اوراکانات → ایمیدازول پروپیونات"
+      },
+      {
+        "left": "مسیر نهایی",
+        "right": "N-formiminoglutamate → گلوتامات"
+      }
+    ],
+    "explanation": "ترتیب مسیر مطابق متن جزوه تنظیم شده است."
+  },
+  {
+    "id": "q41",
+    "type": "truefalse",
+    "topic": "PKU",
+    "difficulty": "متوسط",
+    "question": "اگر فنیل‌آلانین به تیروزین تبدیل نشود، تیروزین در PKU همچنان برای همهٔ انواع نیازی به اضافه شدن ندارد.",
+    "answer": false,
+    "explanation": "جزوه می‌گوید با اختلال تبدیل، تیروزین باید به رژیم اضافه شود؛ نوع نقص تعیین‌کنندهٔ درمان است."
+  },
+  {
+    "id": "q42",
+    "type": "mcq",
+    "topic": "اختلالات کلیوی",
+    "difficulty": "دشوار",
+    "question": "در متن جزوه، کدام مورد با glycinuria مرتبط شده است؟",
+    "options": [
+      "افزایش تیروزین",
+      "تشکیل سنگ‌های اگزالاتی",
+      "کاهش گلوتامات",
+      "بوی شیرهٔ افرا"
+    ],
+    "answer": 1,
+    "explanation": "دفع گلایسین در جزوه با تشکیل سنگ‌های اگزالاتی پیوند داده شده است."
+  },
+  {
+    "id": "q43",
+    "type": "mcq",
+    "topic": "نقص آنزیمی",
+    "difficulty": "متوسط",
+    "question": "اگر فعالیت یک آنزیم فقط حدود ۲۰٪ کاهش یافته باشد، متن جزوه این وضعیت را چگونه توضیح می‌دهد؟",
+    "options": [
+      "نقص شدید و بدون فعالیت",
+      "ممکن است بیماری خفیف باشد چون حدود ۸۰٪ فعالیت باقی مانده است",
+      "همیشه کشنده است",
+      "اصلاً نقص آنزیمی نیست"
+    ],
+    "answer": 1,
+    "explanation": "مثال صریح جزوه: کاهش ۲۰٪ فعالیت می‌تواند به نقص خفیف منجر شود."
+  },
+  {
+    "id": "q44",
+    "type": "mcq",
+    "topic": "بیوسنتز",
+    "difficulty": "دشوار",
+    "question": "کدام گزینه در جزوه به شباهت ساختاری سرین و سیستئین اشاره می‌کند؟",
+    "options": [
+      "هر دو OH دارند",
+      "سرین OH و سیستئین SH دارد",
+      "هر دو SH دارند",
+      "سرین NH2 و سیستئین COOH دارد"
+    ],
+    "answer": 1,
+    "explanation": "جزوه صراحتاً سرین را دارای OH و سیستئین را دارای SH معرفی می‌کند."
+  },
+  {
+    "id": "q45",
+    "type": "mcq",
+    "topic": "PKU",
+    "difficulty": "دشوار",
+    "question": "اگر مشکل از دی‌هیدروبیوپترین و تتراهیدروبیوپترین باشد و فنیل‌آلانین هیدروکسیلاز عملکرد صحیحی داشته باشد، طبق جزوه چه رویکردی مطرح است؟",
+    "options": [
+      "حذف کامل تیروزین",
+      "افزودن بیوپترین‌ها به‌صورت مکمل",
+      "فقط افزایش پروتئین",
+      "قطع تمام آمینواسیدها"
+    ],
+    "answer": 1,
+    "explanation": "در چنین حالتی جزوه اضافه کردن دی‌هیدروبیوپترین / تتراهیدروبیوپترین به‌عنوان مکمل را مطرح می‌کند."
+  }
+];
+
+    // --- State Management ---
+    let appState = {
+      theme: "light",
+      fontSize: "medium",
+      fcKnown: {}, // { fc_1: true, ... }
+      bookmarks: {}, // { q_id: true }
+      quizHistory: [], // [{ id, correct: bool, topic, diff, userAns, correctAns }]
+      currentQuiz: null
+    };
+
+    function loadState() {
+      const saved = Storage.getItem("urea_app_state");
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          appState = Object.assign(appState, parsed);
+        } catch (e) {}
+      }
+      applyThemeAndFont();
+    }
+
+    function saveState() {
+      Storage.setItem("urea_app_state", JSON.stringify(appState));
+    }
+
+    function applyThemeAndFont() {
+      document.documentElement.setAttribute("data-theme", appState.theme || "light");
+      document.documentElement.setAttribute("data-font-size", appState.fontSize || "medium");
+      const themeSelect = document.getElementById("themeSelect");
+      const fontSelect = document.getElementById("fontSizeSelect");
+      if (themeSelect) themeSelect.value = appState.theme || "light";
+      if (fontSelect) fontSelect.value = appState.fontSize || "medium";
+    }
+
+    // --- Tab Navigation Router ---
+    function initNavigation() {
+      const navBtns = document.querySelectorAll(".nav-btn");
+      navBtns.forEach(btn => {
+        btn.addEventListener("click", () => {
+          const tab = btn.getAttribute("data-tab");
+          switchTab(tab);
+        });
+      });
+
+      window.addEventListener("hashchange", () => {
+        const hash = window.location.hash.replace("#", "");
+        if (hash) switchTab(hash, false);
+      });
+
+      if (window.location.hash) {
+        switchTab(window.location.hash.replace("#", ""), false);
+      }
+    }
+
+    function switchTab(tabId, updateHash = true) {
+      const targetSec = document.getElementById("tab-" + tabId);
+      if (!targetSec) return;
+
+      document.querySelectorAll(".tab-content").forEach(el => el.classList.remove("active"));
+      document.querySelectorAll(".nav-btn").forEach(el => el.classList.remove("active"));
+
+      targetSec.classList.add("active");
+      const btn = document.querySelector(`.nav-btn[data-tab="${tabId}"]`);
+      if (btn) btn.classList.add("active");
+
+      if (updateHash) {
+        window.location.hash = tabId;
+      }
+
+      if (tabId === "analytics") {
+        renderAnalytics();
+      }
+    }
+
+    // --- Tab 1: TOC Auto-generator ---
+    function initTOC() {
+      const lectureArticle = document.getElementById("lectureArticle");
+      const tocList = document.getElementById("tocList");
+      if (!lectureArticle || !tocList) return;
+
+      const headings = lectureArticle.querySelectorAll("h2, h3");
+      tocList.innerHTML = "";
+      headings.forEach((heading, idx) => {
+        if (!heading.id) {
+          heading.id = "heading-" + idx;
+        }
+        const li = document.createElement("li");
+        const a = document.createElement("a");
+        a.href = "#" + heading.id;
+        a.textContent = heading.textContent;
+        if (heading.tagName.toLowerCase() === "h3") {
+          a.classList.add("h3-link");
+        }
+        a.addEventListener("click", (e) => {
+          e.preventDefault();
+          heading.scrollIntoView({ behavior: "smooth" });
+        });
+        li.appendChild(a);
+        tocList.appendChild(li);
+      });
+    }
+
+    // --- Tab 2: Flashcards Logic ---
+    let fcFilteredList = [];
+    let fcIndex = 0;
+
+    function initFlashcards() {
+      const filterSelect = document.getElementById("fcTopicFilter");
+      const scene = document.getElementById("fcScene");
+      const cardEl = document.getElementById("flashcardElement");
+      const prevBtn = document.getElementById("fcPrevBtn");
+      const nextBtn = document.getElementById("fcNextBtn");
+      const knownBtn = document.getElementById("fcKnownBtn");
+      const unknownBtn = document.getElementById("fcUnknownBtn");
+
+      filterSelect.addEventListener("change", () => {
+        applyFcFilter();
+      });
+
+      scene.addEventListener("click", () => {
+        cardEl.classList.toggle("is-flipped");
+      });
+
+      prevBtn.addEventListener("click", () => {
+        if (fcIndex > 0) {
+          fcIndex--;
+          renderFlashcard();
+        }
+      });
+
+      nextBtn.addEventListener("click", () => {
+        if (fcIndex < fcFilteredList.length - 1) {
+          fcIndex++;
+          renderFlashcard();
+        }
+      });
+
+      knownBtn.addEventListener("click", () => {
+        if (fcFilteredList[fcIndex]) {
+          appState.fcKnown[fcFilteredList[fcIndex].id] = true;
+          saveState();
+          updateFcProgress();
+          if (fcIndex < fcFilteredList.length - 1) {
+            fcIndex++;
+            renderFlashcard();
+          }
+        }
+      });
+
+      unknownBtn.addEventListener("click", () => {
+        if (fcFilteredList[fcIndex]) {
+          delete appState.fcKnown[fcFilteredList[fcIndex].id];
+          saveState();
+          updateFcProgress();
+          if (fcIndex < fcFilteredList.length - 1) {
+            fcIndex++;
+            renderFlashcard();
+          }
+        }
+      });
+
+      applyFcFilter();
+    }
+
+    function applyFcFilter() {
+      const filterVal = document.getElementById("fcTopicFilter").value;
+      if (filterVal === "all") {
+        fcFilteredList = flashcardsData.slice();
+      } else {
+        fcFilteredList = flashcardsData.filter(item => item.topic === filterVal);
+      }
+      fcIndex = 0;
+      renderFlashcard();
+      updateFcProgress();
+    }
+
+    function renderFlashcard() {
+      const cardEl = document.getElementById("flashcardElement");
+      cardEl.classList.remove("is-flipped");
+
+      if (fcFilteredList.length === 0) {
+        document.getElementById("fcFrontText").textContent = "کارت موجود نیست.";
+        document.getElementById("fcBackText").textContent = "";
+        document.getElementById("fcTopicLabel").textContent = "";
+        return;
+      }
+
+      const item = fcFilteredList[fcIndex];
+      document.getElementById("fcTopicLabel").textContent = "مبحث: " + item.topic;
+      document.getElementById("fcFrontText").textContent = item.front;
+      document.getElementById("fcBackText").textContent = item.back;
+    }
+
+    function updateFcProgress() {
+      const total = fcFilteredList.length;
+      let knownCount = 0;
+      fcFilteredList.forEach(item => {
+        if (appState.fcKnown[item.id]) knownCount++;
+      });
+      document.getElementById("fcProgressText").textContent = `${knownCount} از ${total} بلد بودم`;
+    }
+
+    // --- Tab 3: Text Normalizer & Quiz Logic ---
+    function normalizeText(str) {
+      if (!str) return "";
+      let s = String(str);
+      // Arabic/Persian digits to Latin
+      const pDigits = ["۰","۱","۲","۳","۴","۵","۶","۷","۸","۹"];
+      const aDigits = ["٠","١","٢","٣","٤","٥","٦","٧","٨","٩"];
+      for (let i = 0; i < 10; i++) {
+        s = s.replace(new RegExp(pDigits[i], "g"), String(i));
+        s = s.replace(new RegExp(aDigits[i], "g"), String(i));
+      }
+      // Remove Diacritics
+      s = s.replace(/[ً-ٰٟ]/g, "");
+      // Unify Arabic Yeh/Kaf to Persian
+      s = s.replace(/ي/g, "ی"); // ي -> ی
+      s = s.replace(/ى/g, "ی"); // ى -> ی
+      s = s.replace(/ك/g, "ک"); // ك -> ک
+      // ZWNJ to space, and normalize multiple whitespace
+      s = s.replace(/‌/g, " ");
+      s = s.replace(/\s+/g, " ");
+      return s.trim().toLowerCase();
+    }
+
+    let activeQuizQuestions = [];
+    let currentQuizIndex = 0;
+    let quizUserAnswers = {}; // { q_idx: { isCorrect, userAns, details } }
+
+    function initQuizModule() {
+      const btnStart = document.getElementById("btnStartQuiz");
+      const btnNext = document.getElementById("btnQuizNext");
+      const btnPrev = document.getElementById("btnQuizPrev");
+      const btnRestart = document.getElementById("btnRestartQuiz");
+      const btnBookmark = document.getElementById("btnBookmarkQuiz");
+
+      btnStart.addEventListener("click", startNewQuiz);
+      btnNext.addEventListener("click", () => {
+        if (currentQuizIndex < activeQuizQuestions.length - 1) {
+          currentQuizIndex++;
+          renderQuizQuestion();
+        } else {
+          finishQuiz();
+        }
+      });
+
+      btnPrev.addEventListener("click", () => {
+        if (currentQuizIndex > 0) {
+          currentQuizIndex--;
+          renderQuizQuestion();
+        }
+      });
+
+      btnRestart.addEventListener("click", () => {
+        document.getElementById("quizResultPanel").style.display = "none";
+        document.getElementById("quizSetupPanel").style.display = "block";
+      });
+
+      btnBookmark.addEventListener("click", () => {
+        const q = activeQuizQuestions[currentQuizIndex];
+        if (!q) return;
+        if (appState.bookmarks[q.id]) {
+          delete appState.bookmarks[q.id];
+        } else {
+          appState.bookmarks[q.id] = true;
+        }
+        saveState();
+        updateBookmarkButton();
+      });
+    }
+
+    function startNewQuiz() {
+      const topic = document.getElementById("quizTopic").value;
+      const diff = document.getElementById("quizDiff").value;
+      const count = parseInt(document.getElementById("quizCount").value, 10) || 5;
+
+      let pool = questionsData.filter(q => {
+        if (topic !== "all" && q.topic !== topic) return false;
+        if (diff !== "all" && q.difficulty !== diff) return false;
+        return true;
+      });
+
+      if (pool.length === 0) {
+        alert("سؤالی با این فیلترها یافت نشد!");
+        return;
+      }
+
+      // Shuffle
+      pool = pool.sort(() => Math.random() - 0.5);
+      activeQuizQuestions = pool.slice(0, count);
+      currentQuizIndex = 0;
+      quizUserAnswers = {};
+
+      document.getElementById("quizSetupPanel").style.display = "none";
+      document.getElementById("quizResultPanel").style.display = "none";
+      document.getElementById("quizActiveArea").style.display = "block";
+
+      renderQuizQuestion();
+    }
+
+    function updateBookmarkButton() {
+      const q = activeQuizQuestions[currentQuizIndex];
+      const lbl = document.getElementById("bookmarkLabel");
+      if (appState.bookmarks[q.id]) {
+        lbl.textContent = "نشان‌شده ⭐";
+      } else {
+        lbl.textContent = "نشان کردن";
+      }
+    }
+
+    function renderQuizQuestion() {
+      const q = activeQuizQuestions[currentQuizIndex];
+      document.getElementById("quizQuestionTracker").textContent = `سؤال ${currentQuizIndex + 1} از ${activeQuizQuestions.length}`;
+      document.getElementById("quizBadgeTopic").textContent = q.topic;
+      document.getElementById("quizBadgeDiff").textContent = q.difficulty;
+      document.getElementById("quizQuestionPrompt").textContent = q.question;
+
+      updateBookmarkButton();
+
+      const container = document.getElementById("quizInteractiveContainer");
+      container.innerHTML = "";
+
+      const expBox = document.getElementById("quizExplanationBox");
+      expBox.style.display = "none";
+      expBox.textContent = "";
+
+      const existingAns = quizUserAnswers[currentQuizIndex];
+
+      if (q.type === "mcq") {
+        renderMCQ(container, q, existingAns);
+      } else if (q.type === "truefalse") {
+        renderTrueFalse(container, q, existingAns);
+      } else if (q.type === "fillblank") {
+        renderFillBlank(container, q, existingAns);
+      } else if (q.type === "matching") {
+        renderMatching(container, q, existingAns);
+      }
+
+      if (existingAns) {
+        showExplanation(q.explanation);
+      }
+
+      // Update button text
+      const nextBtn = document.getElementById("btnQuizNext");
+      if (currentQuizIndex === activeQuizQuestions.length - 1) {
+        nextBtn.textContent = "مشاهده کارنامه";
+      } else {
+        nextBtn.textContent = "سؤال بعدی";
+      }
+    }
+
+    function showExplanation(text) {
+      const expBox = document.getElementById("quizExplanationBox");
+      expBox.innerHTML = `<strong>پاسخ تشریحی:</strong> ${text}`;
+      expBox.style.display = "block";
+    }
+
+    function recordQuizAnswer(isCorrect, userAnsText, correctAnsText) {
+      const q = activeQuizQuestions[currentQuizIndex];
+      quizUserAnswers[currentQuizIndex] = {
+        isCorrect: isCorrect,
+        userAns: userAnsText,
+        correctAns: correctAnsText
+      };
+      appState.quizHistory.push({
+        id: q.id,
+        topic: q.topic,
+        difficulty: q.difficulty,
+        correct: isCorrect,
+        question: q.question,
+        userAns: userAnsText,
+        correctAns: correctAnsText
+      });
+      saveState();
+      showExplanation(q.explanation);
+    }
+
+    const persLetters = ["الف", "ب", "ج", "د"];
+
+    function renderMCQ(container, q, existingAns) {
+      const grid = document.createElement("div");
+      grid.className = "quiz-options-grid";
+
+      q.options.forEach((opt, idx) => {
+        const btn = document.createElement("button");
+        btn.className = "option-btn";
+        btn.innerHTML = `<span style="font-weight: bold; min-width: 25px;">${persLetters[idx]})</span> <span>${opt}</span>`;
+
+        if (existingAns) {
+          btn.disabled = true;
+          if (idx === q.answer) btn.classList.add("correct");
+          if (existingAns.userAnsIndex === idx && !existingAns.isCorrect) {
+            btn.classList.add("incorrect");
+          }
+        } else {
+          btn.addEventListener("click", () => {
+            const isCorrect = (idx === q.answer);
+            quizUserAnswers[currentQuizIndex] = {
+              isCorrect: isCorrect,
+              userAnsIndex: idx,
+              userAns: opt,
+              correctAns: q.options[q.answer]
+            };
+            recordQuizAnswer(isCorrect, opt, q.options[q.answer]);
+            renderQuizQuestion();
+          });
+        }
+        grid.appendChild(btn);
+      });
+      container.appendChild(grid);
+    }
+
+    function renderTrueFalse(container, q, existingAns) {
+      const grid = document.createElement("div");
+      grid.className = "quiz-options-grid";
+      grid.style.gridTemplateColumns = "1fr 1fr";
+
+      const choices = [
+        { label: "درست (صحیح)", val: true },
+        { label: "نادرست (غلط)", val: false }
+      ];
+
+      choices.forEach(ch => {
+        const btn = document.createElement("button");
+        btn.className = "option-btn";
+        btn.style.justifyContent = "center";
+        btn.textContent = ch.label;
+
+        if (existingAns) {
+          btn.disabled = true;
+          if (ch.val === q.answer) btn.classList.add("correct");
+          if (existingAns.userChoice === ch.val && !existingAns.isCorrect) {
+            btn.classList.add("incorrect");
+          }
+        } else {
+          btn.addEventListener("click", () => {
+            const isCorrect = (ch.val === q.answer);
+            quizUserAnswers[currentQuizIndex] = {
+              isCorrect: isCorrect,
+              userChoice: ch.val,
+              userAns: ch.label,
+              correctAns: q.answer ? "درست" : "نادرست"
+            };
+            recordQuizAnswer(isCorrect, ch.label, q.answer ? "درست" : "نادرست");
+            renderQuizQuestion();
+          });
+        }
+        grid.appendChild(btn);
+      });
+      container.appendChild(grid);
+    }
+
+    function renderFillBlank(container, q, existingAns) {
+      const wrapper = document.createElement("div");
+      wrapper.style.margin = "1rem 0";
+
+      const input = document.createElement("input");
+      input.type = "text";
+      input.placeholder = "پاسخ خود را وارد کنید...";
+      input.style.marginBottom = "0.75rem";
+
+      const btnSubmit = document.createElement("button");
+      btnSubmit.className = "btn";
+      btnSubmit.textContent = "ثبت پاسخ";
+
+      if (existingAns) {
+        input.value = existingAns.userAns;
+        input.disabled = true;
+        btnSubmit.disabled = true;
+        const note = document.createElement("div");
+        note.style.marginTop = "0.5rem";
+        note.style.fontWeight = "bold";
+        note.style.color = existingAns.isCorrect ? "var(--success)" : "var(--error)";
+        note.textContent = existingAns.isCorrect ? "✔️ پاسخ شما صحیح بود." : `❌ پاسخ شما نادرست بود (پاسخ نمونه: ${q.acceptable[0]})`;
+        wrapper.appendChild(input);
+        wrapper.appendChild(note);
+      } else {
+        btnSubmit.addEventListener("click", () => {
+          const val = input.value.trim();
+          if (!val) return;
+          const normVal = normalizeText(val);
+          const isCorrect = q.acceptable.some(acc => normalizeText(acc) === normVal);
+          recordQuizAnswer(isCorrect, val, q.acceptable[0]);
+          renderQuizQuestion();
+        });
+        wrapper.appendChild(input);
+        wrapper.appendChild(btnSubmit);
+      }
+      container.appendChild(wrapper);
+    }
+
+    function renderMatching(container, q, existingAns) {
+      const matchingBox = document.createElement("div");
+      matchingBox.className = "matching-container";
+
+      if (existingAns) {
+        matchingBox.innerHTML = "<div style='grid-column: span 2; padding: 1rem; text-align: center; color: var(--text-muted);'>پاسخ‌های این بخش ثبت شده است.</div>";
+        container.appendChild(matchingBox);
+        return;
+      }
+
+      // Stateful matching within session
+      const leftItems = q.pairs.map(p => p.left);
+      const rightItems = q.pairs.map(p => p.right).sort(() => Math.random() - 0.5);
+
+      let selectedLeft = null;
+      let matchedPairs = {};
+
+      const leftCol = document.createElement("div");
+      leftCol.style.display = "flex";
+      leftCol.style.flexDirection = "column";
+      leftCol.style.gap = "0.5rem";
+
+      const rightCol = document.createElement("div");
+      rightCol.style.display = "flex";
+      rightCol.style.flexDirection = "column";
+      rightCol.style.gap = "0.5rem";
+
+      leftItems.forEach(item => {
+        const div = document.createElement("div");
+        div.className = "matching-item";
+        div.textContent = item;
+        div.addEventListener("click", () => {
+          if (div.classList.contains("matched")) return;
+          leftCol.querySelectorAll(".matching-item").forEach(el => el.classList.remove("selected"));
+          div.classList.add("selected");
+          selectedLeft = item;
+        });
+        leftCol.appendChild(div);
+      });
+
+      rightItems.forEach(item => {
+        const div = document.createElement("div");
+        div.className = "matching-item";
+        div.textContent = item;
+        div.addEventListener("click", () => {
+          if (!selectedLeft || div.classList.contains("matched")) return;
+          matchedPairs[selectedLeft] = item;
+
+          // Check pairs
+          const pairDef = q.pairs.find(p => p.left === selectedLeft);
+          const isMatch = (pairDef && pairDef.right === item);
+
+          div.classList.add("matched");
+          const lEl = Array.from(leftCol.children).find(el => el.textContent === selectedLeft);
+          if (lEl) lEl.classList.add("matched");
+          selectedLeft = null;
+
+          if (Object.keys(matchedPairs).length === q.pairs.length) {
+            // Evaluated
+            let allCorrect = true;
+            q.pairs.forEach(p => {
+              if (matchedPairs[p.left] !== p.right) allCorrect = false;
+            });
+            recordQuizAnswer(allCorrect, "تطابق کامل شده", "تطابق صحیح جفت‌ها");
+            renderQuizQuestion();
+          }
+        });
+        rightCol.appendChild(div);
+      });
+
+      matchingBox.appendChild(leftCol);
+      matchingBox.appendChild(rightCol);
+      container.appendChild(matchingBox);
+    }
+
+    function finishQuiz() {
+      document.getElementById("quizActiveArea").style.display = "none";
+      const resultPanel = document.getElementById("quizResultPanel");
+      resultPanel.style.display = "block";
+
+      let correctCount = 0;
+      const mistakes = [];
+
+      activeQuizQuestions.forEach((q, idx) => {
+        const ans = quizUserAnswers[idx];
+        if (ans && ans.isCorrect) {
+          correctCount++;
+        } else {
+          mistakes.push({
+            q: q.question,
+            userAns: ans ? ans.userAns : "بدون پاسخ",
+            correctAns: ans ? ans.correctAns : q.explanation
+          });
+        }
+      });
+
+      const pct = Math.round((correctCount / activeQuizQuestions.length) * 100) || 0;
+      document.getElementById("quizFinalScore").textContent = pct + "%";
+
+      const mistakesListEl = document.getElementById("quizMistakesList");
+      if (mistakes.length === 0) {
+        mistakesListEl.innerHTML = "<p style='color: var(--success);'>عالی! هیچ پاسخ غلطی نداشتید.</p>";
+      } else {
+        let html = "<ul style='padding-right: 1.25rem;'>";
+        mistakes.forEach(m => {
+          html += `<li style='margin-bottom: 0.75rem;'>
+            <strong>سؤال:</strong> ${m.q}<br>
+            <span style='color: var(--error);'>پاسخ شما: ${m.userAns}</span> | 
+            <span style='color: var(--success);'>پاسخ صحیح: ${m.correctAns}</span>
+          </li>`;
+        });
+        html += "</ul>";
+        mistakesListEl.innerHTML = html;
+      }
+    }
+
+    // --- Tab 4: Analytics Logic ---
+    function renderAnalytics() {
+      const history = appState.quizHistory || [];
+      const total = history.length;
+      const correct = history.filter(h => h.correct).length;
+      const accuracy = total > 0 ? Math.round((correct / total) * 100) : 0;
+
+      document.getElementById("statTotalAnswered").textContent = total;
+      document.getElementById("statOverallAccuracy").textContent = accuracy + "%";
+
+      // By Topic
+      const topicStats = {};
+      const diffStats = {};
+
+      history.forEach(h => {
+        if (!topicStats[h.topic]) topicStats[h.topic] = { total: 0, correct: 0 };
+        topicStats[h.topic].total++;
+        if (h.correct) topicStats[h.topic].correct++;
+
+        if (!diffStats[h.difficulty]) diffStats[h.difficulty] = { total: 0, correct: 0 };
+        diffStats[h.difficulty].total++;
+        if (h.correct) diffStats[h.difficulty].correct++;
+      });
+
+      renderBarChart("topicChartContainer", topicStats);
+      renderBarChart("diffChartContainer", diffStats);
+
+      // Mistakes Table
+      const mistakesBody = document.getElementById("mistakesTableBody");
+      const mistakes = history.filter(h => !h.correct).slice(-10).reverse();
+      if (mistakes.length === 0) {
+        mistakesBody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:var(--text-muted);">هیچ سابقه خطایی ثبت نشده است.</td></tr>';
+      } else {
+        mistakesBody.innerHTML = mistakes.map(m => `
+          <tr>
+            <td>${m.question}</td>
+            <td style="color: var(--error);">${m.userAns || "-"}</td>
+            <td style="color: var(--success);">${m.correctAns || "-"}</td>
+          </tr>
+        `).join("");
+      }
+    }
+
+    function renderBarChart(containerId, statsObj) {
+      const container = document.getElementById(containerId);
+      container.innerHTML = "";
+      const keys = Object.keys(statsObj);
+      if (keys.length === 0) {
+        container.innerHTML = "<div style='color: var(--text-muted); font-size: 0.85rem;'>داده‌ای برای نمایش وجود ندارد.</div>";
+        return;
+      }
+      keys.forEach(key => {
+        const item = statsObj[key];
+        const pct = item.total > 0 ? Math.round((item.correct / item.total) * 100) : 0;
+        const row = document.createElement("div");
+        row.className = "chart-row";
+        row.innerHTML = `
+          <span style="font-size: 0.85rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${key}</span>
+          <div class="bar-track">
+            <div class="bar-fill" style="width: ${pct}%;"></div>
+          </div>
+          <span style="font-size: 0.85rem; text-align: left; font-weight: bold;">${pct}%</span>
+        `;
+        container.appendChild(row);
+      });
+    }
+
+    // --- Settings & Backup/Restore ---
+    function initSettingsModal() {
+      const modal = document.getElementById("settingsModal");
+      const btnOpen = document.getElementById("btnSettingsModal");
+      const btnClose = document.getElementById("btnCloseSettingsModal");
+      const btnSave = document.getElementById("btnSaveSettings");
+      const themeSelect = document.getElementById("themeSelect");
+      const fontSelect = document.getElementById("fontSizeSelect");
+      const btnExport = document.getElementById("btnExportJSON");
+      const importInput = document.getElementById("importFileInput");
+      const btnReset = document.getElementById("btnResetAnalytics");
+
+      btnOpen.addEventListener("click", () => modal.classList.add("open"));
+      btnClose.addEventListener("click", () => modal.classList.remove("open"));
+      btnSave.addEventListener("click", () => {
+        appState.theme = themeSelect.value;
+        appState.fontSize = fontSelect.value;
+        saveState();
+        applyThemeAndFont();
+        modal.classList.remove("open");
+      });
+
+      themeSelect.addEventListener("change", () => {
+        appState.theme = themeSelect.value;
+        applyThemeAndFont();
+      });
+
+      fontSelect.addEventListener("change", () => {
+        appState.fontSize = fontSelect.value;
+        applyThemeAndFont();
+      });
+
+      // Export JSON
+      btnExport.addEventListener("click", () => {
+        const dataStr = JSON.stringify(appState, null, 2);
+        const blob = new Blob([dataStr], { type: "application/json;charset=utf-8;" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `urea_study_backup_${new Date().toISOString().slice(0,10)}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      });
+
+      // Import JSON
+      importInput.addEventListener("change", (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          try {
+            const imported = JSON.parse(event.target.result);
+            if (typeof imported === "object" && imported !== null) {
+              appState = Object.assign(appState, imported);
+              saveState();
+              applyThemeAndFont();
+              renderAnalytics();
+              updateFcProgress();
+              alert("پشتیبان با موفقیت بازیابی شد!");
+              modal.classList.remove("open");
+            }
+          } catch (err) {
+            alert("خطا در خواندن فایل JSON پشتیبان.");
+          }
+        };
+        reader.readAsText(file);
+      });
+
+      // Reset Analytics
+      btnReset.addEventListener("click", () => {
+        if (confirm("آیا از بازنشانی کامل سوابق آزمون و پیشرفت فلش‌کارت‌ها اطمینان دارید؟")) {
+          appState.fcKnown = {};
+          appState.bookmarks = {};
+          appState.quizHistory = [];
+          saveState();
+          renderAnalytics();
+          updateFcProgress();
+          alert("تمام پیشرفت‌ها با موفقیت پاک شدند.");
+        }
+      });
+    }
+
+    // --- Initialization ---
+    document.addEventListener("DOMContentLoaded", () => {
+      loadState();
+      initNavigation();
+      initTOC();
+      initFlashcards();
+      initQuizModule();
+      initSettingsModal();
+    });
+  </script>
 </body>
 </html>
