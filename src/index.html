@@ -3,19 +3,30 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
   <title>Dent HTML</title>
+  <link rel="stylesheet" href="styles/tokens.css">
   <link rel="stylesheet" href="styles/global.css">
+  <link rel="stylesheet" href="styles/components.css">
+  <link rel="stylesheet" href="styles/responsive.css">
+  <link rel="stylesheet" href="styles/motion.css">
 </head>
 <body>
   <main id="app">
     <section data-component="header"></section>
     <section data-component="hero"></section>
     <section data-component="navigation"></section>
-    <section data-component="flashcard"></section>
     <section data-component="lecture"></section>
+    <section data-component="flashcard"></section>
     <section data-component="quiz"></section>
+    <section data-component="modal"></section>
   </main>
 
+  <noscript>برای استفاده از بخش‌های تعاملی این صفحه، JavaScript را فعال کنید.</noscript>
+  <script src="scripts/theme.js"></script>
+  <script src="scripts/navigation.js"></script>
+  <script src="scripts/flashcard.js"></script>
+  <script src="scripts/quiz.js"></script>
   <script src="scripts/app.js"></script>
 </body>
 </html>
