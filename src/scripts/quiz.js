@@ -12,8 +12,9 @@
         if (!option || !quiz.contains(option)) return;
 
         quiz.querySelectorAll('[data-quiz-option]').forEach((button) => {
-          button.classList.toggle('is-selected', button === option);
-          button.setAttribute('aria-pressed', button === option ? 'true' : 'false');
+          const selected = button === option;
+          button.classList.toggle('is-selected', selected);
+          button.setAttribute('aria-pressed', selected ? 'true' : 'false');
         });
 
         quiz.dataset.selectedAnswer = option.dataset.quizOption || '';
@@ -21,7 +22,27 @@
     },
 
     checkAnswer(question, answer) {
-      return { question, answer };
+      const selected = String(answer ?? '');
+      const correct = String(question?.answer ?? '');
+      const result = {
+        correct: selected === correct,
+        answer: selected,
+        expected: correct
+      };
+
+      if (window.DentState) {
+        const current = DentState.get();
+        DentState.update({
+          quiz: {
+            ...current.quiz,
+            answered: current.quiz.answered + 1,
+            correct: current.quiz.correct + (result.correct ? 1 : 0),
+            lastQuestion: question?.id ?? null
+          }
+        });
+      }
+
+      return result;
     }
   };
 })();
