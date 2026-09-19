@@ -2,6 +2,8 @@ import fs from 'node:fs';
 
 const required = [
   'index.html',
+  'metabolism-protein-session5.html',
+  'src/index.html',
   'src/scripts/app.js',
   'src/scripts/content-loader.js',
   'src/scripts/theme.js',
@@ -43,19 +45,28 @@ if (missing.length) {
   process.exit(1);
 }
 
-const index = fs.readFileSync('index.html', 'utf8');
+const production = fs.readFileSync('index.html', 'utf8');
+const modularIndex = fs.readFileSync('src/index.html', 'utf8');
+
 const missingMounts = components.filter(
-  (component) => !index.includes(`data-component="${component}"`)
+  (component) => !modularIndex.includes(`data-component="${component}"`)
 );
 
 if (missingMounts.length) {
-  console.error('Missing component mounts:', missingMounts.join(', '));
+  console.error('Missing modular component mounts:', missingMounts.join(', '));
   process.exit(1);
 }
 
-if (!index.includes('src/scripts/app.js')) {
-  console.error('Runtime entrypoint is not connected in index.html');
+if (!modularIndex.includes('scripts/app.js')) {
+  console.error('Modular runtime entrypoint is not connected in src/index.html');
   process.exit(1);
 }
 
-console.log(`Release integrity validation passed (${required.length} files, ${components.length} mounts checked).`);
+for (const marker of ['id="lectureArticle"', 'id="tab-flashcards"', 'id="tab-quiz"', 'id="tab-analytics"']) {
+  if (!production.includes(marker)) {
+    console.error(`Production index is missing marker: ${marker}`);
+    process.exit(1);
+  }
+}
+
+console.log(`Release integrity validation passed (${required.length} files, ${components.length} modular mounts + production page checked).`);
