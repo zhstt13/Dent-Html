@@ -21,6 +21,11 @@
       });
     },
 
+    async loadContent(path = 'content/example-content.json') {
+      if (!window.DentContent) return null;
+      return DentContent.load(path);
+    },
+
     checkAnswer(question, answer) {
       const selected = String(answer ?? '');
       const correct = String(question?.answer ?? '');
