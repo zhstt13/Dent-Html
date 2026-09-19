@@ -19,6 +19,23 @@ Design/runtime changes include:
 - normalized standalone copy at `metabolism-protein-session5.html`
 - stable checkpoint at `versions/metabolism-protein-session5-premium-v1.html`
 
+## Next-Generation Design Source
+
+The next Dent HTML redesign is now **design-first and implementation-gated**.
+
+- Product/design source of truth: `design/`
+- Master spec: `design/00_MASTER_DESIGN_SPEC.md`
+- Screen/state map: `design/01_SCREEN_AND_STATE_MAP.md`
+- Design system: `design/02_DESIGN_SYSTEM.md`
+- Responsive/performance contract: `design/03_RESPONSIVE_AND_PERFORMANCE.md`
+- Figma handoff: `design/04_FIGMA_HANDOFF.md`
+- Implementation gate: `design/05_IMPLEMENTATION_GATE.md`
+- Machine-readable tokens: `design/tokens.json`
+- Machine-readable states: `design/state-map.json`
+- Figma visual source: https://www.figma.com/design/rUMTqCZUJyxYhxkm5GW747
+
+**Rule:** the current `index.html` remains production until the new design passes the implementation gate. New visual decisions must be captured under `design/` before they are implemented in production.
+
 ## Architecture
 - `index.html` = production page
 - `src/components/` = modular component markup and component CSS
