@@ -3,7 +3,11 @@ import fs from 'node:fs';
 const files = [
   'src/scripts/app.js',
   'src/scripts/state.js',
-  'src/scripts/content-loader.js'
+  'src/scripts/content-loader.js',
+  'src/scripts/flashcard.js',
+  'src/scripts/quiz.js',
+  'src/scripts/result.js',
+  'src/scripts/progress.js'
 ];
 
 const failures = [];
