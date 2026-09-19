@@ -10,16 +10,7 @@
     'modal'
   ];
 
-  const styledComponents = new Set([
-    'header',
-    'hero',
-    'navigation',
-    'lecture',
-    'flashcard',
-    'quiz',
-    'modal'
-  ]);
-
+  const styledComponents = new Set(components);
   const appScript = document.currentScript;
   const appScriptUrl = appScript?.src
     ? new URL(appScript.src, document.baseURI)
@@ -32,7 +23,6 @@
 
   function ensureComponentStyle(name) {
     if (!styledComponents.has(name)) return;
-
     const selector = `link[data-dent-component-style="${name}"]`;
     if (document.querySelector(selector)) return;
 
@@ -47,89 +37,42 @@
     const target = document.querySelector(`[data-component="${name}"]`);
     if (!target) return false;
 
-    target.setAttribute('aria-busy', 'true');
-
     try {
-      const response = await fetch(componentUrl(name, 'component.html'), {
-        cache: 'no-cache'
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
-      }
-
+      const response = await fetch(componentUrl(name, 'component.html'), { cache: 'no-cache' });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
       ensureComponentStyle(name);
       target.innerHTML = await response.text();
-      target.removeAttribute('aria-busy');
-      target.dispatchEvent(new CustomEvent('component-mounted', {
-        bubbles: true,
-        detail: { name }
-      }));
+      target.dispatchEvent(new CustomEvent('component-mounted', { bubbles: true, detail: { name } }));
       return true;
     } catch (error) {
-      target.removeAttribute('aria-busy');
       target.dataset.componentState = 'error';
       console.warn(`Component ${name} could not load`, error);
       return false;
     }
   }
 
-  async function mountComponents() {
-    const results = [];
-
-    for (const name of components) {
-      results.push({
-        name,
-        mounted: await mountComponent(name)
-      });
-    }
-
-    return results;
-  }
-
-  function initController(globalName) {
-    const controller = window[globalName];
-    if (!controller || typeof controller.init !== 'function') return;
-
-    try {
-      controller.init();
-    } catch (error) {
-      console.warn(`${globalName} failed to initialize`, error);
-    }
-  }
-
-  let initializationPromise = null;
-
   window.DentApp = {
     components: [...components],
-    mountComponent,
-    mountComponents,
-    init() {
-      if (initializationPromise) return initializationPromise;
+    async init() {
+      const mountResults = [];
+      for (const name of components) {
+        mountResults.push({ name, mounted: await mountComponent(name) });
+      }
 
-      initializationPromise = (async () => {
-        const mountResults = await mountComponents();
+      ['DentTheme', 'DentNavigation', 'DentFlashcard', 'DentQuiz'].forEach((name) => {
+        const controller = window[name];
+        if (controller?.init) controller.init();
+      });
 
-        initController('DentTheme');
-        initController('DentNavigation');
-        initController('DentFlashcard');
-        initController('DentQuiz');
+      window.dispatchEvent(new CustomEvent('dent-components-ready', { detail: { mountResults } }));
+      window.dispatchEvent(new CustomEvent('dent-app-ready', { detail: { mountResults } }));
 
-        window.dispatchEvent(new CustomEvent('dent-app-ready', {
-          detail: { mountResults }
-        }));
-
-        return mountResults;
-      })();
-
-      return initializationPromise;
+      return mountResults;
     }
   };
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-      window.DentApp.init();
-    }, { once: true });
+    document.addEventListener('DOMContentLoaded', () => window.DentApp.init(), { once: true });
   } else {
     window.DentApp.init();
   }
