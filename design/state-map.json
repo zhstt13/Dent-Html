@@ -1,0 +1,110 @@
+{
+  "schemaVersion": "1.0.0",
+  "areas": {
+    "lecture": {
+      "states": [
+        "entry",
+        "reading",
+        "toc-open",
+        "settings-open"
+      ],
+      "primaryActionByState": {
+        "entry": "continue-reading",
+        "reading": "read",
+        "toc-open": "jump-to-section",
+        "settings-open": "save-or-close"
+      }
+    },
+    "flashcards": {
+      "states": [
+        "ready",
+        "front",
+        "back",
+        "confidence-committed",
+        "complete"
+      ],
+      "invariants": [
+        "front-must-not-contain-answer",
+        "confidence-actions-only-after-reveal"
+      ]
+    },
+    "quiz": {
+      "states": [
+        "setup",
+        "unanswered",
+        "selected",
+        "correct",
+        "incorrect",
+        "result"
+      ],
+      "invariants": [
+        "submit-disabled-until-selection",
+        "feedback-hidden-before-submit",
+        "correct-and-incorrect-use-text-plus-color"
+      ]
+    },
+    "analytics": {
+      "states": [
+        "empty",
+        "populated"
+      ],
+      "requiredBlocks": [
+        "key-metrics",
+        "mastery",
+        "next-best-action"
+      ]
+    },
+    "settings": {
+      "desktop": "modal",
+      "mobile": "bottom-sheet"
+    }
+  },
+  "navigation": {
+    "desktop": [
+      "lecture",
+      "flashcards",
+      "quiz",
+      "analytics",
+      "settings"
+    ],
+    "mobileBottom": [
+      "lecture",
+      "flashcards",
+      "quiz",
+      "analytics"
+    ],
+    "mobileTop": [
+      "settings"
+    ]
+  },
+  "targetFrames": {
+    "desktop": [
+      "Lecture",
+      "Flashcards Front",
+      "Flashcards Back",
+      "Quiz Setup",
+      "Quiz Question",
+      "Quiz Correct",
+      "Quiz Incorrect",
+      "Quiz Result",
+      "Analytics Empty",
+      "Analytics Populated",
+      "Settings"
+    ],
+    "mobile": [
+      "Lecture",
+      "TOC Sheet",
+      "Flashcards Front",
+      "Flashcards Back",
+      "Flashcards Complete",
+      "Quiz Setup",
+      "Quiz Question",
+      "Quiz Correct",
+      "Quiz Incorrect",
+      "Quiz Result",
+      "Analytics Empty",
+      "Analytics Populated",
+      "Settings Sheet"
+    ]
+  }
+}
